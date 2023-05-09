@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Club {
@@ -9,17 +9,8 @@ export class Club {
   name: string;
 
   @Column()
-  img: string;
+  description: string;
 
   @Column()
   admin: string;
-
-  // join1
-  // 동아리원
-
-  // join2
-  // 모임일자
-
-  // join3
-  // 모임일자 별 참가자
 }

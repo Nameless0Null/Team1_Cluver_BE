@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ClubController } from './apis/club/club.controller';
-import { ClubService } from './apis/club/club.service';
+import { ClubModule } from './club/club.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeORMConfig } from './configs/typeorm.config';
 
 @Module({
-  imports: [],
-  controllers: [ClubController],
-  providers: [ClubService],
+  imports: [
+    ClubModule, //
+    TypeOrmModule.forRoot(typeORMConfig),
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
