@@ -1,16 +1,26 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
-export class Club {
+export class Club extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column()
-  name: string;
+  title: string;
 
   @Column()
   description: string;
 
   @Column()
-  admin: string;
+  status: string;
+
+  @ManyToOne((type) => User, (user) => user.clubs, { eager: false })
+  user: User;
 }
