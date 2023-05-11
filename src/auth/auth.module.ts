@@ -9,12 +9,11 @@ import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
 import { Manager } from 'src/entity/manager.entity';
 
-const jwtConfig: any = config.get('jwt');
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: jwtConfig.secret,
+      secret: process.env.JWT_SECRETKEY,
       signOptions: {
         expiresIn: 60 * 60 * 24,
       },

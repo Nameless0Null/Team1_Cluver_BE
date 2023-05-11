@@ -3,10 +3,9 @@ import {
   TypeOrmModuleAsyncOptions,
   TypeOrmModuleOptions,
 } from '@nestjs/typeorm/dist';
-import * as config from 'config';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-const dbConfig: any = config.get('db');
 export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
     return {
@@ -17,7 +16,7 @@ export default class TypeOrmConfig {
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      synchronize: dbConfig.synchronize,
+      synchronize: true,
     };
   }
 }
