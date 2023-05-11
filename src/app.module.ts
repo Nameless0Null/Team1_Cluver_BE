@@ -8,11 +8,11 @@ import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync(typeORMConfigAsync), //
     ConfigurationModule,
     ClubModule,
     AuthModule,
     AttendanceModule,
+    TypeOrmModule.forRootAsync(typeORMConfigAsync), //
   ],
   controllers: [],
   providers: [],

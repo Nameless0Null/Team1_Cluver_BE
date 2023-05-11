@@ -10,12 +10,12 @@ const dbConfig: any = config.get('db');
 export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
     return {
-      type: dbConfig.type,
-      host: dbConfig.host,
-      port: dbConfig.port,
-      username: configService.get('DB_USER'),
-      password: configService.get('DB_PASSWORD'),
-      database: dbConfig.database,
+      type: process.env.DATABASE_TYPE as 'mysql',
+      host: process.env.DATABASE_HOST,
+      port: Number(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: dbConfig.synchronize,
     };
