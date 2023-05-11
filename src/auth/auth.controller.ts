@@ -11,6 +11,7 @@ import { AuthCredentialDto } from './dto/auth-credentials';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './get-user.decorator';
 import { User } from 'src/entity/user.entity';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +26,9 @@ export class AuthController {
 
   @Post('/signin')
   signIn(
-    @Body(ValidationPipe) authCredentialDto: AuthCredentialDto, //
+    @Body(ValidationPipe) loginDto: LoginDto, //
   ): Promise<{ accessToken: string }> {
-    return this.authService.signIn(authCredentialDto);
+    return this.authService.signIn(loginDto);
   }
 
   // req 찍기

@@ -11,51 +11,56 @@ import { Repository } from 'typeorm';
 import { AuthCredentialDto } from './dto/auth-credentials';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt/dist';
+import { Manager } from 'src/entity/manager.entity';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Manager)
+    private managerRepository: Repository<Manager>,
     private jwtService: JwtService,
   ) {}
 
-  async signUp(authCredentialDto: AuthCredentialDto): Promise<User> {
-    const { username, password } = authCredentialDto;
+  async signUp(authCredentialDto: AuthCredentialDto): Promise<Manager> {
+    const { manager_id, manager_email, manager_name, manager_password } =
+      authCredentialDto;
 
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(manager_password, salt);
 
-    const user = {
-      username,
-      password: hashedPassword,
+    const manager = {
+      manager_id,
+      manager_email,
+      manager_name,
+      manager_password: hashedPassword,
     };
 
     try {
-      return await this.userRepository.save(user);
+      return await this.managerRepository.save(manager);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException('존재하는 유저이름');
+        throw new ConflictException('존재하는 매니저이름');
       } else {
         throw new InternalServerErrorException();
       }
-      console.log('error : ', error);
     }
   }
 
-  async signIn(
-    authCredentialDto: AuthCredentialDto,
-  ): Promise<{ accessToken: string }> {
-    const { username, password } = authCredentialDto;
-    const user = await this.userRepository.findOne({ where: { username } });
+  async signIn(loginDto: LoginDto): Promise<{ accessToken: string }> {
+    const { id, password } = loginDto;
+    const manager = await this.managerRepository.findOne({
+      where: { manager_id: id },
+    });
 
-    if (!user) {
-      throw new NotFoundException(`${username}의 유저는 없음.`);
+    if (!manager) {
+      throw new NotFoundException(`해당 id의 매니저 없음. id : ${id}`);
     }
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (manager && (await bcrypt.compare(password, manager.manager_password))) {
+      const name = manager.manager_name;
       // 로그인 성공 로직
-      const payload = { username };
-      const accessToken = await this.jwtService.sign(payload);
+      const payload = { name };
+      const accessToken = this.jwtService.sign(payload);
 
       return { accessToken };
     } else {

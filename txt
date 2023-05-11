@@ -1,8 +1,14 @@
-nestjs 내부 exeception filters> BadRequestException UnauthorizedException
-NotFoundException ForbiddenException NotAcceptableException
-RequestTimeoutException ConflictException GoneException
-HttpVersionNotSupportedException PayloadTooLargeException
-UnsupportedMediaTypeException UnprocessableEntityException
-InternalServerErrorException NotImplementedException ImATeapotException
-MethodNotAllowedException BadGatewayException ServiceUnavailableException
-GatewayTimeoutException PreconditionFailedException
+<nestjs 내부 exeception filters>
+  BadRequestException UnauthorizedException NotFoundException ForbiddenException
+  NotAcceptableException RequestTimeoutException ConflictException GoneException
+  HttpVersionNotSupportedException PayloadTooLargeException
+  UnsupportedMediaTypeException UnprocessableEntityException
+  InternalServerErrorException NotImplementedException ImATeapotException
+  MethodNotAllowedException BadGatewayException ServiceUnavailableException
+  GatewayTimeoutException PreconditionFailedException <로그 관련> log warning
+  error debug verbose <테이블> 동아리 관리자 유저 동아리 - 모임일자
+</nestjs>
+
+api 너무 복잡. 스웨거 or 개발서버 배포해야할듯. 이미지저장 - 스웨거를 해도,
+결국에 배포해야하네. [기초배포] - 클라우드 scale up 노트북 뒷판 뜯어서 램 달아
+scale out 노트북 한대 더사 [심화배포] 쿠버네티스

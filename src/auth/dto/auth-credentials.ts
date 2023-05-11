@@ -1,10 +1,13 @@
 import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class AuthCredentialDto {
+  manager_id: string;
+  manager_email: string;
+
   @IsString()
   @MinLength(4)
   @MaxLength(20)
-  username: string;
+  manager_name: string;
 
   @IsString()
   @MinLength(4)
@@ -12,5 +15,5 @@ export class AuthCredentialDto {
   @Matches(/^[a-zA-Z0-9]*$/, {
     message: '비밀번호는 영어와 숫자로만 구성해야함',
   })
-  password: string;
+  manager_password: string;
 }

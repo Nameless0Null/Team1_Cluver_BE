@@ -10,12 +10,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Club } from 'src/entity/club.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
+import { Manager } from 'src/entity/manager.entity';
+import { Attendance } from 'src/attendance/attendance.entity';
 
 @Injectable()
 export class ClubService {
   constructor(
     @InjectRepository(Club)
     private clubRepository: Repository<Club>,
+
+    @InjectRepository(Manager)
+    private managerRepository: Repository<Manager>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
+    @InjectRepository(Attendance)
+    private attendanceRepository: Repository<Attendance>,
   ) {}
 
   async getAllClubs(): Promise<Club[]> {
@@ -35,15 +46,32 @@ export class ClubService {
     if (!found) {
       throw new NotFoundException(`Can't found Club with id ${id}`);
     }
+
+    // 동아리원 쭉 출력
+    const users: User[] = found.users;
+    console.log('users : ', users);
+    users.forEach((user) => {
+      console.log('user.attendances : ', user.attendances);
+    });
+
+    // 동아리원 별로 이름 + 유저코드 + 출석배열 출력되게
+
     return found;
   }
 
-  async createClub(createClubDto: CreateClubDto, user: User): Promise<Club> {
-    const { title, description } = createClubDto;
+  async createClub(
+    createClubDto: CreateClubDto,
+    manager: Manager,
+  ): Promise<Club> {
+    const { name, description, img } = createClubDto;
+    const club = { name, description, status: ClubStatus.PUBLIC, img };
 
-    const club = { title, description, status: ClubStatus.PUBLIC, user };
+    // club Repository에 저장
+    const saved_club = await this.clubRepository.save(club);
 
-    return await this.clubRepository.save(club);
+    // manager Repository에 저장
+    await this.managerRepository.save({ ...manager, club: saved_club });
+    return saved_club;
   }
 
   async deleteClub(id: number, user: User): Promise<string> {

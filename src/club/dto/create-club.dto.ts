@@ -1,8 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateClubDto {
+  img: string;
+
   @IsNotEmpty()
-  title: string;
+  name: string;
 
   @IsNotEmpty()
   description: string;

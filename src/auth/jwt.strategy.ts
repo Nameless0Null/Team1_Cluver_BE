@@ -4,27 +4,32 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
+import * as config from 'config';
+import { Manager } from 'src/entity/manager.entity';
 
+const jwtConfig: any = config.get('jwt');
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Manager)
+    private managerRepository: Repository<Manager>,
   ) {
     super({
-      secretOrKey: 'secretkey',
+      secretOrKey: jwtConfig.secret,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
 
   async validate(payload) {
-    const { username } = payload;
-    const user = await this.userRepository.findOne({ where: { username } });
+    const { manager_name } = payload;
+    const manager = await this.managerRepository.findOne({
+      where: { manager_name },
+    });
 
-    if (!user) {
+    if (!manager) {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return manager;
   }
 }

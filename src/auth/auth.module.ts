@@ -6,17 +6,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import * as config from 'config';
+import { Manager } from 'src/entity/manager.entity';
 
+const jwtConfig: any = config.get('jwt');
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'secretkey',
+      secret: jwtConfig.secret,
       signOptions: {
         expiresIn: 60 * 60 * 24,
       },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Manager]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy], // auth 모듈에서 사용하기 위함
