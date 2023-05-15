@@ -10,18 +10,23 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ClubAttendance } from './club_attendance.entity';
 
 @Entity()
 export class Attendance extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
-  date: string;
-
   @ManyToOne(() => User, (user) => user.attendances, { eager: false })
   user: User;
 
-  @ManyToOne(() => Club, (club) => club.attendances, { eager: false })
-  club: Club;
+  @ManyToOne(
+    () => ClubAttendance,
+    (club_attendance) => club_attendance.attendances,
+    { eager: true },
+  )
+  club_attendance: ClubAttendance;
+
+  @Column()
+  isChecked: boolean;
 }

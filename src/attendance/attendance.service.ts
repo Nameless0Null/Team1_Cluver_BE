@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Attendance } from './attendance.entity';
+import { Attendance } from '../entity/attendance.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Club } from 'src/entity/club.entity';
@@ -42,10 +42,6 @@ export class AttendanceService {
     const attendance = { date, user, club };
 
     return await this.attendanceRepository.save(attendance);
-  }
-
-  async test() {
-    console.log('test');
   }
 
   async getAllAttendances(): Promise<Attendance[]> {

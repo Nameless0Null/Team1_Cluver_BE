@@ -13,7 +13,7 @@ import { Manager } from 'src/entity/manager.entity';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRETKEY,
+      secret: 'secretkey',
       signOptions: {
         expiresIn: 60 * 60 * 24,
       },

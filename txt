@@ -1,16 +1,69 @@
-<nestjs 내부 exeception filters>
-  BadRequestException UnauthorizedException NotFoundException ForbiddenException
-  NotAcceptableException RequestTimeoutException ConflictException GoneException
-  HttpVersionNotSupportedException PayloadTooLargeException
-  UnsupportedMediaTypeException UnprocessableEntityException
-  InternalServerErrorException NotImplementedException ImATeapotException
-  MethodNotAllowedException BadGatewayException ServiceUnavailableException
-  GatewayTimeoutException PreconditionFailedException <로그 관련> log warning
-  error debug verbose <테이블> 동아리 관리자 유저 동아리 - 모임일자
-</nestjs>
 
-api 너무 복잡. 스웨거 or 개발서버 배포해야할듯. 이미지저장 - 스웨거를 해도,
-결국에 배포해야하네. [기초배포] - 클라우드 scale up 노트북 뒷판 뜯어서 램 달아
-scale out 노트북 한대 더사 [심화배포] 쿠버네티스 배포 세팅 구글컴퓨터로 ssh
-눌러서 접근 1. docker-compose 설치 2. git clone 3. docker 실행 git clone 했는데,
-아이디 비밀번호(토큰) 치는 창이 안나옴. 외부ip 내부ip
+
+<!-- 
+<개선방향>
+club_attendance
+-totalnum
+---> user테이블에서, clubId가 n인 놈의 총 갯수
+---> 얘를 서비스 로직에서 실행시키면, 바로 구현할 수 있는데
+---> 엔티티 상에서 가능?
+---> 안그러면 서비스 로직에서, get Club 같은 엔트리에 물리는 방식?
+- checkNum
+---> 얘는 현재 로직에서 보완이 힘들듯.
+
+<nestjs 내부 exeception filters>
+  BadRequestException
+  UnauthorizedException
+  NotFoundException
+  ForbiddenException  
+  NotAcceptableException
+  RequestTimeoutException
+  ConflictException
+  GoneException
+  HttpVersionNotSupportedException
+  PayloadTooLargeException
+  UnsupportedMediaTypeException
+  UnprocessableEntityException
+  InternalServerErrorException
+  NotImplementedException
+  ImATeapotException
+  MethodNotAllowedException
+  BadGatewayException
+  ServiceUnavailableException
+  GatewayTimeoutException
+  PreconditionFailedException
+   
+
+
+[기초배포] 
+- 클라우드 
+scale up 노트북 뒷판 뜯어서 램 달아
+scale out 노트북 한대 더사 
+
+-> 일단 backend db 도커에 담아서, 한번에 올리는 걸로 목표.
+
+[심화배포] 쿠버네티스 배포 세팅 
+
+구글컴퓨터로 ssh눌러서 접근 
+1. docker-compose 설치 2. git clone 3. docker 실행 
+git clone 했는데,
+아이디 비밀번호(토큰) 치는 창이 안나옴.
+
+현재 만들어야되는 것
+- 출석체크 시작할 때
+----> 랜덤코드 발급
+----> club_attendance에 추가
+----> user에도 club_attendance 추가
+- 출석체크 
+----> 유저테이블에서, attendance
+---->
+
+
+유저별 출석률
+- 마이페이지
+---> 동아리1
+-----> 출석관련
+-----> 출석률, 출석일자, 결석일자
+---> 동아리2
+-----> 출석관련
+-----> 출석률, 출석일자, 결석일자

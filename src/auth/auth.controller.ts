@@ -1,22 +1,43 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService, IManagerWithoutPassword } from './auth.service';
 import { AuthCredentialDto } from './dto/auth-credentials';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { LoginDto } from './dto/login.dto';
+import { Manager } from 'src/entity/manager.entity';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { LoginRequest, signUpRequest } from 'src/configs/swagger.config';
 
+interface OutputSignIn {
+  accessToken: string;
+  manager: IManagerWithoutPassword;
+}
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({ summary: '회원가입' })
+  // Body에 대한 명세 설정
+  @ApiBody({
+    type: signUpRequest,
+  })
   @Post('/signup')
   signUp(
     @Body(ValidationPipe) authCredentialDto: AuthCredentialDto, //
@@ -24,27 +45,28 @@ export class AuthController {
     return this.authService.signUp(authCredentialDto);
   }
 
+  @ApiOperation({ summary: '로그인' })
+  // Body에 대한 명세 설정
+  @ApiBody({
+    type: LoginRequest,
+  })
   @Post('/signin')
   signIn(
     @Body(ValidationPipe) loginDto: LoginDto, //
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; manager: IManagerWithoutPassword }> {
     return this.authService.signIn(loginDto);
   }
 
-  // req 찍기
-  // @Post('/test')
-  // @UseGuards(AuthGuard())
-  // authTest(
-  //   @Req() req, //
-  // ) {
-  //   console.log('req.user : ', req.user);
-  // }
-
-  @Post('/test')
+  @ApiOperation({ summary: '토큰 유효성 검증' })
+  @ApiCreatedResponse({
+    description: '맞으면 true, 아니면 401에러',
+    type: Boolean,
+  })
+  @Get('/check')
   @UseGuards(AuthGuard())
-  authTest(
-    @GetUser() user: User, //
+  authCheck(
+    @GetUser() manager: Manager, //
   ) {
-    console.log('user : ', user);
+    return true as boolean;
   }
 }

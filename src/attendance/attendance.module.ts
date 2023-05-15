@@ -3,7 +3,7 @@ import { AttendanceController } from './attendance.controller';
 import { AttendanceService } from './attendance.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entity/user.entity';
-import { Attendance } from './attendance.entity';
+import { Attendance } from '../entity/attendance.entity';
 import { Club } from 'src/entity/club.entity';
 
 @Module({

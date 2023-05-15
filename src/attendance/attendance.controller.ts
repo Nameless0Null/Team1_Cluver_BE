@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
-import { Attendance } from './attendance.entity';
+import { Attendance } from '../entity/attendance.entity';
 
 @Controller('attendance')
 export class AttendanceController {

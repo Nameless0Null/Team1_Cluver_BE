@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
-
 import { Manager } from 'src/entity/manager.entity';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private managerRepository: Repository<Manager>,
   ) {
     super({
-      secretOrKey: process.env.JWT_SECRETKEY,
+      secretOrKey: 'secretkey',
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
@@ -26,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!manager) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('토큰이 유효하지 않음');
     }
 
     return manager;

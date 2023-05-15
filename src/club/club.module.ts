@@ -7,7 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { Manager } from 'src/entity/manager.entity';
 import { User } from 'src/entity/user.entity';
-import { Attendance } from 'src/attendance/attendance.entity';
+import { Attendance } from 'src/entity/attendance.entity';
 
 @Module({
   imports: [

@@ -8,7 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   setupSwagger(app);
-  const port = 3000;
+  const port = 8000;
+
+  app.enableCors();
 
   await app.listen(port);
   console.log(`listening on port ${port}`);

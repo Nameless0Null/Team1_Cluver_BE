@@ -5,6 +5,7 @@ import { typeORMConfigAsync } from './configs/typeorm.config';
 import { AuthModule } from './auth/auth.module';
 import { ConfigurationModule } from 'config/config.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { ClubAttendanceModule } from './club_attendance/club_attendance.module';
 
 @Module({
   imports: [
@@ -12,7 +13,18 @@ import { AttendanceModule } from './attendance/attendance.module';
     ClubModule,
     AuthModule,
     AttendanceModule,
-    TypeOrmModule.forRootAsync(typeORMConfigAsync), //
+    TypeOrmModule.forRoot({
+      type: process.env.DATABASE_TYPE as 'mysql',
+      host: process.env.DATABASE_HOST,
+      port: Number(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_DATABASE,
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
+    ClubAttendanceModule,
+    // TypeOrmModule.forRoot(typeORMConfigAsync), //
   ],
   controllers: [],
   providers: [],

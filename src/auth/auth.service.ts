@@ -13,6 +13,12 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt/dist';
 import { Manager } from 'src/entity/manager.entity';
 import { LoginDto } from './dto/login.dto';
+export interface IManagerWithoutPassword {
+  id: number;
+  manager_id: string;
+  manager_email: string;
+  manager_name: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -23,12 +29,15 @@ export class AuthService {
   ) {}
 
   async signUp(authCredentialDto: AuthCredentialDto): Promise<Manager> {
-    const { manager_id, manager_email, manager_name, manager_password } =
-      authCredentialDto;
+    const { id, email, name, password } = authCredentialDto;
+
+    const manager_id = id;
+    const manager_email = email;
+    const manager_name = name;
+    const manager_password = password;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(manager_password, salt);
-
     const manager = {
       manager_id,
       manager_email,
@@ -47,7 +56,9 @@ export class AuthService {
     }
   }
 
-  async signIn(loginDto: LoginDto): Promise<{ accessToken: string }> {
+  async signIn(
+    loginDto: LoginDto,
+  ): Promise<{ accessToken: string; manager: IManagerWithoutPassword }> {
     const { id, password } = loginDto;
     const manager = await this.managerRepository.findOne({
       where: { manager_id: id },
@@ -61,8 +72,10 @@ export class AuthService {
       // 로그인 성공 로직
       const payload = { name };
       const accessToken = this.jwtService.sign(payload);
+      const managerWithoutPassword = { ...manager };
+      delete managerWithoutPassword.manager_password; // Exclude the password property
 
-      return { accessToken };
+      return { accessToken, manager: managerWithoutPassword };
     } else {
       throw new UnauthorizedException('비밀번호가 틀림.');
     }

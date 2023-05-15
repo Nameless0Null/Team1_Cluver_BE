@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Delete,
   Patch,
   UsePipes,
@@ -20,32 +21,49 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { Manager } from 'src/entity/manager.entity';
-import { ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiTags,
+  ApiBody,
+} from '@nestjs/swagger';
+import * as swagger from '../configs/swagger.config';
 
-@Controller('club')
-@UseGuards(AuthGuard())
+@ApiTags('club')
+@Controller()
+// @UseGuards(AuthGuard())
 export class ClubController {
   constructor(private clubService: ClubService) {}
 
-  @Get('/')
-  @ApiOperation({
-    summary: '동아리 전체 조회',
-    description: '동아리 전체 조회',
-  })
-  @ApiCreatedResponse({ description: '전체 동아리', type: Promise<Club[]> })
+  // @ApiOperation({ summary: '토큰 유효성 검증' })
+  // @ApiCreatedResponse({
+  //   description: '맞으면 true, 아니면 401에러',
+  //   type: Boolean,
+  // })
+  // @ApiBody({
+  //   type: LoginRequest,
+  // })
+
+  @Get('club')
+  @ApiOperation({ summary: '동아리 전체 조회' })
+  @ApiCreatedResponse({ type: swagger.clubsResponse })
   getAllClubs(): Promise<Club[]> {
     return this.clubService.getAllClubs();
   }
 
-  @Get('/my')
+  @Get('club/my')
+  @UseGuards(AuthGuard())
   getClubsByUser(
-    @GetUser() user: User, //
+    @GetUser() manager: Manager, //
   ): Promise<Club[]> {
-    return this.clubService.getClubsByUser(user);
+    return this.clubService.getClubsByManager(manager);
   }
 
-  @Post('/')
+  @ApiOperation({ summary: '동아리 만들기' })
+  @ApiBody({ type: swagger.createClubRequest })
+  @Post('club/')
   @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard())
   createClub(
     @Body() createClubDto: CreateClubDto, //
     @GetUser() manager: Manager,
@@ -56,14 +74,24 @@ export class ClubController {
   // 해당 클럽 조회
   // 동아리원 쭉 출력
   // 동아리원 별로 이름 + 유저코드 + 출석배열 출력되게
-  @Get('/:id')
+  @Get('club/:id')
   getClubById(
     @Param('id') id: number, //
   ): Promise<Club> {
     return this.clubService.getClubById(id);
   }
 
-  @Delete('/:id')
+  @ApiOperation({
+    summary: `axios.get('주소:8000/search?name=검색어') 형태로 넣으면 됩니다`,
+  })
+  @Get('search')
+  async getClubsByName(
+    @Query('name') name: string, //
+  ) {
+    return await this.clubService.getClubsByName(name);
+  }
+
+  @Delete('club/:id')
   deleteClub(
     @Param('id', ParseIntPipe) id: number, //
     @GetUser() user: User,
@@ -71,7 +99,7 @@ export class ClubController {
     return this.clubService.deleteClub(id, user);
   }
 
-  @Patch('/:id/status')
+  @Patch('club/:id/status')
   updateClubStatus(
     @Param('id') id: number,
     @Body('status', ClubStatusValidationPipe) status: ClubStatus,
