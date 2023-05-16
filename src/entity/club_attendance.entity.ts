@@ -33,6 +33,9 @@ export class ClubAttendance extends BaseEntity {
   @Column()
   checkCode: string;
 
+  @Column({ default: true })
+  isValid: boolean = true;
+
   @OneToMany(() => Attendance, (attendance) => attendance.club_attendance, {
     eager: false,
   })

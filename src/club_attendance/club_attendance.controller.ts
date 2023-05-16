@@ -6,13 +6,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ClubAttendanceService } from './club_attendance.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import {
+  clubId_date_Request,
+  codeCheckRequest,
   doCheckRequest,
   doCheckResponse,
   startCheckRequest,
   startCheckResponse,
 } from 'src/configs/swagger.config';
+import { ClubAttendance } from 'src/entity/club_attendance.entity';
 
 @ApiTags('출석')
 @Controller('club-attendance')
@@ -41,22 +44,6 @@ export class ClubAttendanceController {
       clubId,
       activity,
     });
-
-    // [club attendance]
-    // 해당 날짜 row 추가
-    // clubId에 연결되어있는 전체 유저수 긁어와서, totalNum에 박기
-    // this.clubAttendanceService.addClubAttendanceRow({
-    //   date: '1월1일',
-    //   clubId: 1,
-    // });
-    ////////////
-    ////////////
-
-    // [attendance]
-    // 해당 clubId / 새로 만들어진 ClubAttendance Id 가져와
-    // 해당 clubId의 모든 유저들에게 반복문 돌린다
-    // 해당 유저의 id, club_attendance Id, isChecked = 0 row를
-    // attendance 테이블에 추가 (모든 유저들한테)
   }
 
   @ApiOperation({ summary: '출석 체크' })
@@ -76,13 +63,6 @@ export class ClubAttendanceController {
     @Body('usercode') usercode: string,
     // @Body('code') code: string,
   ) {
-    // const isSuccess = await this.clubAttendanceService.checkCode({
-    //   clubId,
-    //   date,
-    //   code,
-    // });
-    // if (!isSuccess) return '출석코드가 틀림';
-
     const isUser = await this.clubAttendanceService.getUserByNameCode({
       username,
       usercode,
@@ -120,17 +100,72 @@ export class ClubAttendanceController {
       // totalnum + 1
       // 출석 체크
     }
+  }
 
-    // 만약 기존에 있던 유저면
-    // [club attendance]
-    // checkNum + 1
-    ////////////
-    // [attendance]
-    // (userId, club_attendanceId ) 에 맞는 row 찾아와서, isChecked를 1로 수정
-    ////////////
-    ////////////
-    // 만약 새로운 유저면
-    // [attendance]
-    // 해당
+  @ApiOperation({ summary: '코드 체크' })
+  @ApiBody({
+    description: '출석코드 체크',
+    type: codeCheckRequest,
+  })
+  @ApiCreatedResponse({
+    description:
+      '상황별로 텍스트로 다옴 -  출석체크 이미 끝났을 때, 출석코드 다를때, 출석 성공했을 때',
+    type: String,
+  })
+  @Post('/codecheck')
+  코드체크(
+    @Body('date') date: string, //
+    @Body('clubId') clubId: number,
+    @Body('code') code: string,
+  ) {
+    return this.clubAttendanceService.코드체크({ date, clubId, code });
+  }
+
+  @ApiOperation({ summary: '출석 마감' })
+  @ApiBody({
+    description: 'club_attendance의 isValid를 false로 바꿈.',
+    type: clubId_date_Request,
+  })
+  @ApiCreatedResponse({
+    description: '마감시킨 club_attendance 정보 반환',
+    type: ClubAttendance,
+  })
+  @Post('/end')
+  출석마감(
+    @Body('date') date: string, //
+    @Body('clubId') clubId: number,
+  ) {
+    return this.clubAttendanceService.마감({ date, clubId });
+  }
+
+  @ApiOperation({ summary: '조회' })
+  @ApiBody({
+    description: 'club_attendance를 조회함',
+    type: clubId_date_Request,
+  })
+  @ApiCreatedResponse({
+    description:
+      '상황별로 텍스트로 옴. 만약에 출석진행중이면 해당 club_attendance 반환',
+    type: ClubAttendance,
+  })
+  @Get('/')
+  async 조회(
+    @Body('date') date: string, //
+    @Body('clubId') clubId: number,
+    @Res() res,
+  ) {
+    const result = await this.clubAttendanceService.조회({ date, clubId });
+    if (result === null) {
+      // 출석코드 없음
+      res.status(202).send('출석코드 없음');
+    } else if (result.isValid === false) {
+      // 출석코드 유효기간 지남
+      res.status(203).send('유효기간 지남');
+    } else if (result) {
+      // 출석 진행중.
+      // 해당 club_attendance 조회
+      console.log('controller : ', result);
+      res.status(200).send(result);
+    }
   }
 }

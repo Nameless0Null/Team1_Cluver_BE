@@ -74,4 +74,5 @@ git clone 했는데,
 [0516]
 club_attendance에 활동내용 추가
 
+start_check 에 권한 설정`
 

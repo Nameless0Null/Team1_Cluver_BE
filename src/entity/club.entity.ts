@@ -33,6 +33,9 @@ export class Club extends BaseEntity {
   @Column()
   img: string;
 
+  @Column({ default: true })
+  club_code: string = '기본코드';
+
   @OneToMany(() => ClubAttendance, (club_attendance) => club_attendance.club, {
     eager: true,
   })

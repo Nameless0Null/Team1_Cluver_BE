@@ -35,14 +35,14 @@ import * as swagger from '../configs/swagger.config';
 export class ClubController {
   constructor(private clubService: ClubService) {}
 
-  // @ApiOperation({ summary: '토큰 유효성 검증' })
-  // @ApiCreatedResponse({
-  //   description: '맞으면 true, 아니면 401에러',
-  //   type: Boolean,
-  // })
-  // @ApiBody({
-  //   type: LoginRequest,
-  // })
+  @Get('/test')
+  @UseGuards(AuthGuard())
+  Test(
+    @GetUser() manager: Manager, //
+  ) {
+    console.log(manager);
+    return manager;
+  }
 
   @Get('club')
   @ApiOperation({ summary: '동아리 전체 조회' })
@@ -60,8 +60,12 @@ export class ClubController {
   }
 
   @ApiOperation({ summary: '동아리 만들기' })
-  @ApiBody({ type: swagger.createClubRequest })
-  @Post('club/')
+  @ApiBody({
+    description:
+      'club_code는 안넣어도 됨. 안넣으면 club_code가 기본코드로 들어감',
+    type: swagger.createClubRequest,
+  })
+  @Post('club')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard())
   createClub(

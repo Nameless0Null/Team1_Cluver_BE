@@ -8,4 +8,9 @@ export class CreateClubDto {
 
   @IsNotEmpty()
   description: string;
+
+  @IsNotEmpty()
+  is_public: boolean;
+
+  club_code: string;
 }

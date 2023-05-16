@@ -64,12 +64,15 @@ export class ClubService {
     createClubDto: CreateClubDto,
     manager: Manager,
   ): Promise<Club> {
-    const { name, description, img } = createClubDto;
+    const { name, description, img, is_public, club_code } = createClubDto;
+    const clubCode = club_code ? club_code : '기본코드';
+
     const club = {
       name,
       description,
-      status: ClubStatus.PUBLIC,
+      status: is_public ? ClubStatus.PUBLIC : ClubStatus.PRIVATE,
       img,
+      club_code: clubCode,
     };
 
     // club Repository에 저장
@@ -77,6 +80,9 @@ export class ClubService {
 
     // manager Repository에 저장
     manager.clubs.push(saved_club);
+
+    console.log(manager.id, manager.manager_name);
+
     await this.managerRepository.save(manager);
 
     return saved_club;

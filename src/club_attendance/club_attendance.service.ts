@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { NotFoundError } from 'rxjs';
 import { Attendance } from 'src/entity/attendance.entity';
 import { Club } from 'src/entity/club.entity';
 import { ClubAttendance } from 'src/entity/club_attendance.entity';
@@ -31,7 +32,11 @@ export class ClubAttendanceService {
   }
 
   async getClubById(clubId: number): Promise<Club> {
-    return await this.clubRepository.findOne({ where: { id: clubId } });
+    const club = await this.clubRepository.findOne({ where: { id: clubId } });
+    if (!club) {
+      throw new BadRequestException(`${clubId}의 clubId를 가지는 클럽은 없음`);
+    }
+    return club;
   }
 
   async getUserByNameCode({ username, usercode }) {
@@ -153,5 +158,46 @@ export class ClubAttendanceService {
         await this.attendanceRepository.save(newRow_attendance);
       }
     });
+  }
+
+  async 조회({ date, clubId }) {
+    const club = await this.getClubById(clubId);
+    let result_club_attendance = null;
+    const club_attendances = club.club_attendances;
+    club_attendances.forEach((each_club_attendance) => {
+      if (each_club_attendance.date === date) {
+        result_club_attendance = each_club_attendance;
+      }
+    });
+    return result_club_attendance;
+  }
+
+  async 마감({ date, clubId }) {
+    const club = await this.getClubById(clubId);
+    let result_club_attendance = null;
+    const club_attendances = club.club_attendances;
+    club_attendances.forEach((each_club_attendance) => {
+      if (each_club_attendance.date === date) {
+        result_club_attendance = each_club_attendance;
+      }
+    });
+    result_club_attendance.isValid = 0;
+    await this.club_attendanceRepository.save(result_club_attendance);
+
+    return result_club_attendance;
+  }
+
+  async 코드체크({ date, clubId, code }) {
+    const club_attendance = await this.조회({ clubId, date });
+    if (!club_attendance) {
+      throw new BadRequestException('해당 club_attendance 없음');
+    }
+    if (!club_attendance.isValid) {
+      return '출석체크 이미 끝났음';
+    }
+    if (club_attendance.checkCode !== code) {
+      return '출석코드가 다름';
+    }
+    return '출석 성공';
   }
 }

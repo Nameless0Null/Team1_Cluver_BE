@@ -50,6 +50,12 @@ export class createClubRequest {
 
   @ApiProperty()
   description: string;
+
+  @ApiProperty()
+  is_public?: boolean;
+
+  @ApiProperty()
+  club_code?: string;
 }
 
 export class startCheckRequest {
@@ -77,6 +83,25 @@ export class doCheckRequest {
 
   @ApiProperty()
   usercode: string;
+}
+
+export class codeCheckRequest {
+  @ApiProperty()
+  date: string;
+
+  @ApiProperty()
+  clubId: number;
+
+  @ApiProperty()
+  code: string;
+}
+
+export class clubId_date_Request {
+  @ApiProperty()
+  date: string;
+
+  @ApiProperty()
+  clubId: number;
 }
 
 export class doCheckResponse {}
