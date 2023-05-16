@@ -34,10 +34,12 @@ export class ClubAttendanceController {
   startCheck(
     @Body('date') date: string, //
     @Body('clubId') clubId: number,
+    @Body('activity') activity: string,
   ): Promise<{ checkCode: string }> {
     return this.clubAttendanceService.addClubAttendanceRow({
       date,
       clubId,
+      activity,
     });
 
     // [club attendance]

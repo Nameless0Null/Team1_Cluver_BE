@@ -42,13 +42,17 @@ export class ClubAttendanceService {
     else return user;
   }
 
-  async addClubAttendanceRow({ date, clubId }): Promise<{ checkCode: string }> {
+  async addClubAttendanceRow({
+    date,
+    clubId,
+    activity,
+  }): Promise<{ checkCode: string }> {
     const checkCode = this.getRandomCode();
 
     // club_attendance
     const club = await this.getClubById(clubId);
     const totalNum = club.users.length;
-    const newRow = { date, totalNum, checkNum: 0, checkCode, club };
+    const newRow = { date, totalNum, checkNum: 0, checkCode, club, activity };
     const result_club_attendance = await this.club_attendanceRepository.save(
       newRow,
     );
