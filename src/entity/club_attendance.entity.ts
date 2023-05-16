@@ -22,6 +22,9 @@ export class ClubAttendance extends BaseEntity {
   date: string;
 
   @Column()
+  activity: string;
+
+  @Column()
   totalNum: number;
 
   @Column()
