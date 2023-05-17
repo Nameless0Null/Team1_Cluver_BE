@@ -1,0 +1,84 @@
+
+
+<!-- 
+<개선방향>
+club_attendance
+-totalnum
+---> user테이블에서, clubId가 n인 놈의 총 갯수
+---> 얘를 서비스 로직에서 실행시키면, 바로 구현할 수 있는데
+---> 엔티티 상에서 가능?
+---> 안그러면 서비스 로직에서, get Club 같은 엔트리에 물리는 방식?
+- checkNum
+---> 얘는 현재 로직에서 보완이 힘들듯.
+
+<nestjs 내부 exeception filters>
+  BadRequestException
+  UnauthorizedException
+  NotFoundException
+  ForbiddenException  
+  NotAcceptableException
+  RequestTimeoutException
+  ConflictException
+  GoneException
+  HttpVersionNotSupportedException
+  PayloadTooLargeException
+  UnsupportedMediaTypeException
+  UnprocessableEntityException
+  InternalServerErrorException
+  NotImplementedException
+  ImATeapotException
+  MethodNotAllowedException
+  BadGatewayException
+  ServiceUnavailableException
+  GatewayTimeoutException
+  PreconditionFailedException
+   
+
+
+[기초배포] 
+- 클라우드 
+scale up 노트북 뒷판 뜯어서 램 달아
+scale out 노트북 한대 더사 
+
+-> 일단 backend db 도커에 담아서, 한번에 올리는 걸로 목표.
+
+[심화배포] 쿠버네티스 배포 세팅 
+
+구글컴퓨터로 ssh눌러서 접근 
+1. docker-compose 설치 2. git clone 3. docker 실행 
+git clone 했는데,
+아이디 비밀번호(토큰) 치는 창이 안나옴.
+
+현재 만들어야되는 것
+- 출석체크 시작할 때
+----> 랜덤코드 발급
+----> club_attendance에 추가
+----> user에도 club_attendance 추가
+- 출석체크 
+----> 유저테이블에서, attendance
+---->
+
+
+-----------------------------
+[0516]
+club_attendance에 활동내용 추가
+
+start_check 에 권한 설정`
+
+
+-----------------------------
+[0517]
+club-attendance api 보수
+
+
+동아리 생성시 매니저 반영 안되는거 해결
+-> 얘느 뭐가 문제일까~ 가보자~
+
+startCheck 중복생성 안되게 -> 프론트에서 체크하지만 혹시 모르니/
+authGuard 필요한 api에 전부 달기
+
+이메일 중복확인
+인증메일 발송
+
+club 조회시에 user -> attendance 가 순서대로
+---> attendance 저장할 때, user 안에서 순서대로 저장안되는 경우가 있는지 체크

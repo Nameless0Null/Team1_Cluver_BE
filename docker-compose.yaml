@@ -1,0 +1,26 @@
+version: '3.7'
+
+# 컴퓨터들
+services:
+  my-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/myfolder/src
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.docker
+
+  my-database:
+    # platform: linux/86_64
+    image: mysql:8.0
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'mydocker'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - 3306:3306

@@ -1,25 +1,55 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
+import { Manager } from './manager.entity';
+import { Attendance } from 'src/entity/attendance.entity';
+import { ClubAttendance } from './club_attendance.entity';
 
 @Entity()
-export class Club {
+export class Club extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  @Exclude()
+  id: number;
 
   @Column()
   name: string;
 
   @Column()
-  img: string;
+  description: string;
 
   @Column()
-  admin: string;
+  status: string;
 
-  // join1
-  // 동아리원
+  @Column()
+  img: string;
 
-  // join2
-  // 모임일자
+  @Column({ default: true })
+  club_code: string = '기본코드';
 
-  // join3
-  // 모임일자 별 참가자
+  @OneToMany(() => ClubAttendance, (club_attendance) => club_attendance.club, {
+    eager: true,
+  })
+  club_attendances: ClubAttendance[];
+
+  // 한사람당 동아리 무조건 하나
+  // 동아리:유저 = 1:N
+  @JoinTable()
+  @OneToMany((type) => User, (users) => users.club, { eager: true })
+  users: User[];
+
+  // 동아리 하나당 관리자 여럿
+  // 한 사람이 동아리 여러개 관리할 수도
+  @JoinTable()
+  @ManyToMany((type) => Manager, (managers) => managers.clubs, { eager: false })
+  managers: Manager[];
 }
