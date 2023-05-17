@@ -105,3 +105,8 @@ export class clubId_date_Request {
 }
 
 export class doCheckResponse {}
+
+export class email_Request {
+  @ApiProperty()
+  email: string;
+}

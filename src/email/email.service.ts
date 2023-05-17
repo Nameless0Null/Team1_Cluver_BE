@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Email } from 'src/entity/email.entity';
 
+const SERVER_URL = process.env.SERVER_URL;
 @Injectable()
 export class EmailService {
   constructor(
@@ -25,14 +26,12 @@ export class EmailService {
   }
 
   async 이메일전송({ email }) {
-    const SERVER_URL = `http://34.64.184.11:8000`;
     const date = new Date();
     date.setHours(date.getHours() + 9);
     const date_format = date.toISOString().replace('T', ' ').substring(0, 19);
 
     // 이메일 내용
     const token = getToken();
-    // const url = 'http://localhost:8080';
     const url = SERVER_URL;
     const redirection_url = `${url}/email/token=${token};email=${email}`;
     const emailTemplate = `
@@ -99,6 +98,11 @@ export class EmailService {
       console.log('catch error :', error);
       return '에러';
     }
+  }
+
+  async 이메일인증완료체크({ email }) {
+    const isChecked = await this.emailRepository.findOne({ where: { email } });
+    return isChecked;
   }
 
   async checkToken({ email, token }) {
