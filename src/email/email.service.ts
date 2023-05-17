@@ -43,18 +43,15 @@ export class EmailService {
                       <table width="700" border="0" cellpadding="0" cellspacing="0">
                           <tbody><tr><td colspan="3" height="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_top.jpg" alt="" border="0" loading="lazy"></td></tr>
                           <tr><td width="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_left.jpg" alt="" border="0" loading="lazy"></td><td width="640" height="190" bgcolor="#f4f5f7" style="background-color: #f4f5f7; background: #f4f5f7 url(https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_cont.jpg) repeat 50% 50%; text-align: center;">
-                          <p style="margin: 0; font-size: 30px; font-weight: bold;">현대자동차 계정 회원가입</p>
+                          <p style="margin: 0; font-size: 30px; font-weight: bold;">Cluver 이메일 인증</p>
                       <p style="margin: 15px 0; font-size: 16px; font-weight: bold;"></p>
                     </td><td width="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_right.jpg" alt="" border="0" loading="lazy"></td></tr>
                 </tbody></table>
               </td></tr>
             <tr><td width="700" style="padding: 40px 30px; text-align: left; letter-spacing: -1px;">
                         <p style="margin: 0 0 30px; font-size: 14px; font-weight: bold; line-height: 1.8;">
-                  <xstring>고객님,</xstring><br>
-                  고객님의 현대자동차 회원가입을 위한 이메일 인증을 요청하였습니다.
-                </p>
-                <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.8;">
-                  현대자동차 회원가입을 하기 위해 사용됩니다.
+                  <xstring></xstring><br>
+                  Cluver 회원가입을 위한 이메일 인증을 요청하였습니다.
                 </p>
                 <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.8;">
                   <b>계정정보</b><br>
@@ -76,16 +73,7 @@ export class EmailService {
                     </td></tr>
                 </tbody></table>
               </td></tr>
-            <tr><td style="padding: 26px 0; background: #1c1b1b;">
-                        <table width="700" border="0" cellpadding="0" cellspacing="0">
-                  <tbody><tr><td style="width: 100px; padding: 2px 0 0; text-align: center; vertical-align: top;">
-                                    <a href="https://www.hyundai.com/kr/ko" target="_blank" rel="noreferrer noopener"><img src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/footer_logo.png" border="0" alt="현대자동차" loading="lazy"></a>
-                                </td><td>
-                                    <p style="margin: 0; color: #666; font-size: 12px;">현대자동차 주식회사 | 서울특별시 서초구 헌릉로 12 | 고객센터 080-600-6000</p>
-                      <p style="margin: 10px 0 0 0; color: #333; font-size: 12px;">Copyright ⓒ Hyundai Motor Company all rights reserved</p>
-                    </td></tr>
-                </tbody></table>
-              </td></tr>
+            
           </tbody></table>
         </div></div></div></div>
                   `;

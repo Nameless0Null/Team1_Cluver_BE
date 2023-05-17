@@ -6,7 +6,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ClubAttendanceService } from './club_attendance.service';
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  Query,
+  Param,
+} from '@nestjs/common';
 import {
   clubId_date_Request,
   codeCheckRequest,
@@ -165,10 +174,11 @@ export class ClubAttendanceController {
     }
   }
 
-  @Get('/calendar')
+  @Post('/calendar')
   async calendar(
     @Body('date') date: string, //
     @Body('clubId') clubId: number,
+    @Req() request,
   ) {
     return this.clubAttendanceService.그날출석한유저리스트({ date, clubId });
   }
