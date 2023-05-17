@@ -165,8 +165,8 @@ export class ClubAttendanceController {
     }
   }
 
-  @Get('/test')
-  async test(
+  @Get('/calendar')
+  async calendar(
     @Body('date') date: string, //
     @Body('clubId') clubId: number,
   ) {
