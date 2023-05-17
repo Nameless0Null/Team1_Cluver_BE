@@ -157,10 +157,7 @@ export class ClubAttendanceController {
     const result = await this.clubAttendanceService.조회({ date, clubId });
     if (result === null) {
       // 출석코드 없음
-      res.status(202).send('출석코드 없음');
-    } else if (result.isValid === false) {
-      // 출석코드 유효기간 지남
-      res.status(203).send('유효기간 지남');
+      res.status(201).send('출석코드 없음');
     } else if (result) {
       // 출석 진행중.
       // 해당 club_attendance 조회

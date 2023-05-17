@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigurationModule } from 'config/config.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { ClubAttendanceModule } from './club_attendance/club_attendance.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ClubAttendanceModule } from './club_attendance/club_attendance.module';
       synchronize: true,
     }),
     ClubAttendanceModule,
+    EmailModule,
     // TypeOrmModule.forRoot(typeORMConfigAsync), //
   ],
   controllers: [],
