@@ -69,4 +69,29 @@ export class AuthController {
   ) {
     return true as boolean;
   }
+
+  @Get()
+  이메일중복체크(
+    @Body('email') email: string, //
+  ) {
+    this.authService.이메일중복체크({ email });
+    return '이메일 중복체크';
+  }
+
+  @Get()
+  이메일전송(
+    @Body('email') email: string, //
+  ) {
+    this.authService.이메일전송({ email });
+    return '이메일 인증';
+  }
+
+  @Get()
+  이메일인증번호체크(
+    @Body('email') email: string, //
+    @Body('token') token: string, //
+  ) {
+    this.authService.이메일인증번호체크({ email, token });
+    return '이메일 인증';
+  }
 }

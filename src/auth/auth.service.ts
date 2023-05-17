@@ -80,4 +80,15 @@ export class AuthService {
       throw new UnauthorizedException('비밀번호가 틀림.');
     }
   }
+
+  async 이메일중복체크({ email }) {
+    const manager = await this.managerRepository.findOne({
+      where: { manager_email: email },
+    });
+    return;
+  }
+
+  async 이메일전송({ email }) {}
+
+  async 이메일인증번호체크({ email, token }) {}
 }

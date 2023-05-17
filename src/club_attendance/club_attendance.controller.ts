@@ -6,7 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ClubAttendanceService } from './club_attendance.service';
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import {
   clubId_date_Request,
   codeCheckRequest,
@@ -148,7 +148,7 @@ export class ClubAttendanceController {
       '상황별로 텍스트로 옴. 만약에 출석진행중이면 해당 club_attendance 반환',
     type: ClubAttendance,
   })
-  @Get('/')
+  @Post('/')
   async 조회(
     @Body('date') date: string, //
     @Body('clubId') clubId: number,
@@ -164,7 +164,6 @@ export class ClubAttendanceController {
     } else if (result) {
       // 출석 진행중.
       // 해당 club_attendance 조회
-      console.log('controller : ', result);
       res.status(200).send(result);
     }
   }

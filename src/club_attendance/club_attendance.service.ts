@@ -169,6 +169,7 @@ export class ClubAttendanceService {
         result_club_attendance = each_club_attendance;
       }
     });
+
     return result_club_attendance;
   }
 
