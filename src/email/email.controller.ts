@@ -1,11 +1,17 @@
-import { Controller, Get, Body, Post } from '@nestjs/common';
+import { Controller, Get, Body, Post, Param } from '@nestjs/common';
 import { EmailService } from './email.service';
+import { email_success_html } from 'src/auth/utils';
+
+interface IParams {
+  token: string;
+  email: string;
+}
 
 @Controller('email')
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
-  @Get('/check')
+  @Post('/duplicate-check')
   async 이메일중복체크(
     @Body('email') email: string, //
   ) {
@@ -21,12 +27,21 @@ export class EmailController {
     return '이메일 전송완료';
   }
 
-  @Get()
+  @Post('/token-check')
   이메일인증번호체크(
     @Body('email') email: string, //
     @Body('token') token: string, //
+  ) {}
+
+  @Get('token=:token;email=:email')
+  async completeAuth(
+    @Param() params: IParams, //
   ) {
-    this.emailService.이메일인증번호체크({ email, token });
-    return '이메일 인증';
+    const token = params.token;
+    const email = params.email;
+    console.log('params : ', params);
+    const check_result = await this.emailService.checkToken({ token, email });
+    if (check_result) return email_success_html;
+    return '인증실패';
   }
 }

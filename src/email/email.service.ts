@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getToken } from 'src/auth/utils';
 import { Manager } from 'src/entity/manager.entity';
-import { SERVER_URL } from 'src/main';
 import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { Email } from 'src/entity/email.entity';
@@ -26,6 +25,7 @@ export class EmailService {
   }
 
   async 이메일전송({ email }) {
+    const SERVER_URL = `http://34.64.184.11:8000`;
     const date = new Date();
     date.setHours(date.getHours() + 9);
     const date_format = date.toISOString().replace('T', ' ').substring(0, 19);
@@ -34,48 +34,26 @@ export class EmailService {
     const token = getToken();
     // const url = 'http://localhost:8080';
     const url = SERVER_URL;
-    const redirection_url = `${url}/token=${token};email=${email}`;
+    const redirection_url = `${url}/email/token=${token};email=${email}`;
     const emailTemplate = `
-        <div class="mail_view_body">
-          <table border="0" cellpadding="0" cellspacing="0" style="width:700px; table-layout:fixed; color:#000; font-size:14px; font-family:">
-                <tbody><tr><td><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/img_mailing_header.jpg" width="700" height="82" alt="" loading="lazy"></td></tr>
-            <tr><td height="220">
-                      <table width="700" border="0" cellpadding="0" cellspacing="0">
-                          <tbody><tr><td colspan="3" height="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_top.jpg" alt="" border="0" loading="lazy"></td></tr>
-                          <tr><td width="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_left.jpg" alt="" border="0" loading="lazy"></td><td width="640" height="190" bgcolor="#f4f5f7" style="background-color: #f4f5f7; background: #f4f5f7 url(https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_cont.jpg) repeat 50% 50%; text-align: center;">
-                          <p style="margin: 0; font-size: 30px; font-weight: bold;">Cluver 이메일 인증</p>
-                      <p style="margin: 15px 0; font-size: 16px; font-weight: bold;"></p>
-                    </td><td width="30"><img align="top" src="https://www.hyundai.com/content/dam/hyundai/kr/ko/images/mail-template/bg_mailing_title_right.jpg" alt="" border="0" loading="lazy"></td></tr>
-                </tbody></table>
-              </td></tr>
-            <tr><td width="700" style="padding: 40px 30px; text-align: left; letter-spacing: -1px;">
-                        <p style="margin: 0 0 30px; font-size: 14px; font-weight: bold; line-height: 1.8;">
-                  <xstring></xstring><br>
-                  Cluver 회원가입을 위한 이메일 인증을 요청하였습니다.
-                </p>
-                <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.8;">
-                  <b>계정정보</b><br>
-                  - 이메일: <span style="color:#00aad2;"><a href="mailto:${email}" target="_blank" rel="noreferrer noopener">${email}</a></span><br>
-                  - 요청 일시: ${date_format}<br>
-                  <a href="${redirection_url}" rel="noreferrer noopener" target="_blank"><button tabindex="0" type="button" style="background-color: #3387bd; color: #fff; margin-top:5px; border:none; width: 200px; max-width: 100%; min-height: 50px; height: auto; font-weight: 600; font-size: 16px; cursor:pointer; "><span>인증받기</span></button></a>
-                </p>
-                <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.8;">
-                  <b>상세설명</b><br>
-                  - 이메일 인증 요청 후 인증 링크는 발송된 시점부터 10분간만 유효합니다.<br>
-                  - 인증 링크가 만료되면 재 요청이 필요합니다.<br>
-                  - 만약 고객님이 이메일 인증 요청하지 않으셨다면 이 메일을 무시하세요. 이메일 인증이 되지 않습니다.
-                </p>
-              </td></tr>		
-            <tr><td style="background: #f7f3f2;">
-                        <table width="700" border="0" cellpadding="0" cellspacing="0">
-                            <tbody><tr><td style="padding: 30px; font-size: 12px; line-height: 1.4em; letter-spacing: -1px;">
-                                    <ul style="margin: 0; padding-left: 10px;"><li style="margin-top: 5px;">본 메일은 현대자동차를 통해 고객님께서 등록하신 이메일 주소로 발송하는 발신전용 메일이며, 본 메일에 대해서는 회신을 할 수 없습니다.</li><li style="margin-top: 5px;">문의사항이 있으시면 <a href="https://www.hyundai.com/kr/ko/ask" target="_blank" style="text-decoration: none;" rel="noreferrer noopener"><strong style="color: #00aad2">Q&amp;A 게시판</strong></a> 또는 고객센터(080-600-6000)를 이용하여주시기 바랍니다.</li></ul>
-                    </td></tr>
-                </tbody></table>
-              </td></tr>
-            
-          </tbody></table>
-        </div></div></div></div>
+    <body style="background: linear-gradient(135deg, #89ec84 0%, #abc0e4 55%, #abc0e4 83%, #c7d5ed 100%); display: flex; justify-content: center; align-items: center; height: 100vh;">
+  <div class="mail_view_body" style="background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); padding: 40px; width: 400px; text-align: center; font-family: Arial, sans-serif;">
+    <h1 class="title" style="font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #555;">Cluver 이메일 인증</h1>
+    <p class="paragraph" style="font-size: 16px; margin-bottom: 20px; color: #333;">Cluver 회원가입을 위한 이메일 인증을 요청하였습니다.</p>
+    <div class="account-info" style="margin-bottom: 20px; color: #666;">
+      <p>- 이메일: ${email}</p>
+      <p>- 요청 일시: ${date}</p>
+    </div>
+    <a href="${redirection_url}" style="background-color: #abc0e4; color: #fff; border: none; border-radius: 4px; padding: 12px 24px; font-size: 16px; text-decoration: none; cursor: pointer; transition: background-color 0.3s;">인증받기</a>
+    <div class="paragraph" style="font-size: 14px; margin-top: 20px; color: #777;">
+      <ul style="text-align: left; margin-left: 20px;">
+        <li>이메일 인증 요청 후 인증 링크는 발송된 시점부터 10분간만 유효합니다.</li>
+        <li>인증 링크가 만료되면 재요청이 필요합니다.</li>
+        <li>만약 고객님이 이메일 인증 요청하지 않으셨다면 이 메일을 무시하세요. 이메일 인증이 되지 않습니다.</li>
+      </ul>
+    </div>
+  </div>
+</body>
                   `;
 
     // 이메일 보내기
@@ -91,7 +69,7 @@ export class EmailService {
       await transporter.sendMail({
         from: 'coghks0426@gmail.com',
         to: email,
-        subject: `현대자동차 회원가입을 위한 이메일 인증을 요청하였습니다.`,
+        subject: `Cluver 회원가입을 위한 이메일 인증 `,
         html: emailTemplate,
       });
 
@@ -123,5 +101,23 @@ export class EmailService {
     }
   }
 
-  async 이메일인증번호체크({ email, token }) {}
+  async checkToken({ email, token }) {
+    // 이메일 긁어서 이메일 찾고.
+    // 해당 토큰 가져오기
+    const email_result = await this.emailRepository.findOne({
+      where: { email },
+    });
+    const token_result = email_result.token;
+
+    // url에 포함된 토큰이, 맞는지.
+    if (token_result === token) {
+      await this.emailRepository.save({
+        ...email_result,
+        isChecked: true,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

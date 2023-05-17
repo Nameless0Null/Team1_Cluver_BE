@@ -14,7 +14,6 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { Manager } from 'src/entity/manager.entity';
 import { LoginDto } from './dto/login.dto';
 import { getToken } from './utils';
-import { SERVER_URL } from 'src/main';
 import * as nodemailer from 'nodemailer';
 export interface IManagerWithoutPassword {
   id: number;
