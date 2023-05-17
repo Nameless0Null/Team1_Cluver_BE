@@ -1,6 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundError } from 'rxjs';
+import { NotFoundError, throwError } from 'rxjs';
 import { Attendance } from 'src/entity/attendance.entity';
 import { Club } from 'src/entity/club.entity';
 import { ClubAttendance } from 'src/entity/club_attendance.entity';
@@ -200,5 +204,60 @@ export class ClubAttendanceService {
       return '출석코드가 다름';
     }
     return '출석 성공';
+  }
+
+  async 그날출석한유저리스트({ date, clubId }) {
+    const club = await this.getClubById(clubId);
+
+    const club_attendance = await this.조회({ date, clubId });
+    if (!club_attendance)
+      throw new NotFoundException('해당 club_attendance 없음');
+
+    const attendance_array = await this.attendanceRepository.find({
+      select: ['id', 'isChecked'],
+      where: { club_attendance },
+    });
+
+    const attendance_id_array = [];
+    const user_id_array = [];
+
+    attendance_array.forEach((element) => {
+      console.log(element);
+      console.log(element.isChecked);
+      if (element.isChecked) attendance_id_array.push(element.id);
+    });
+
+    const user_array = club.users;
+
+    user_array.forEach((each_user) => {
+      each_user.attendances.forEach((attendance) => {
+        // console.log(attendance.id);
+        // console.log(attendance_id_array);
+        if (attendance_id_array.includes(attendance.id)) {
+          // console.log('걸린 ', attendance.id);
+          user_id_array.push(each_user.id);
+          return true;
+        }
+
+        return false;
+      });
+    });
+
+    const result = [];
+
+    user_array.forEach((element) => {
+      if (user_id_array.includes(element.id)) {
+        const username = element.user_name;
+        const usercode = element.code;
+        result.push({ username, usercode });
+      }
+    });
+
+    return result;
+
+    // for -> user array
+    //   for -> user_array.attendance
+    //     attendance.id in dattendance_array
+    //       result 에 user_id, user_code 추가
   }
 }

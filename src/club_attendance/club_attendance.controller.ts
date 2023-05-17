@@ -164,4 +164,12 @@ export class ClubAttendanceController {
       res.status(200).send(result);
     }
   }
+
+  @Get('/test')
+  async test(
+    @Body('date') date: string, //
+    @Body('clubId') clubId: number,
+  ) {
+    return this.clubAttendanceService.그날출석한유저리스트({ date, clubId });
+  }
 }

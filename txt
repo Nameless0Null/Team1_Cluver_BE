@@ -80,3 +80,5 @@ authGuard 필요한 api에 전부 달기
 이메일 중복확인
 인증메일 발송
 
+club 조회시에 user -> attendance 가 순서대로
+---> attendance 저장할 때, user 안에서 순서대로 저장안되는 경우가 있는지 체크
