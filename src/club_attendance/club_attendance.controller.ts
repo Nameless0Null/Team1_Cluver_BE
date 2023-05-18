@@ -43,11 +43,18 @@ export class ClubAttendanceController {
     type: startCheckResponse,
   })
   @Post('/startcheck')
-  startCheck(
+  async startCheck(
     @Body('date') date: string, //
     @Body('clubId') clubId: number,
     @Body('activity') activity: string,
-  ): Promise<{ checkCode: string }> {
+  ): Promise<{ checkCode: string } | string> {
+    const isAlready =
+      await this.clubAttendanceService.getClubAttendanceByDateClubId({
+        clubId,
+        date,
+      });
+    if (isAlready)
+      return `날짜 : ${date} / clubId : ${clubId}의 출석은 이미 진행됐음`;
     return this.clubAttendanceService.addClubAttendanceRow({
       date,
       clubId,
@@ -70,7 +77,6 @@ export class ClubAttendanceController {
     @Body('clubId') clubId: number,
     @Body('username') username: string,
     @Body('usercode') usercode: string,
-    // @Body('code') code: string,
   ) {
     const isUser = await this.clubAttendanceService.getUserByNameCode({
       username,
@@ -78,6 +84,7 @@ export class ClubAttendanceController {
     });
 
     // 기존에 있던 유저가 출석체크 한거면
+    // 1. club_Attendance에 checkNum 반영
     if (isUser) {
       await this.clubAttendanceService.addCheckNum({
         date,
@@ -87,10 +94,8 @@ export class ClubAttendanceController {
       });
     }
     // 기존에 없던 유저인 경우
+    // 1. club_Attendance에 checkNum 반영
     else {
-      // user
-      // 이름, 코드, 클럽 추가
-      //
       const newUser = await this.clubAttendanceService.addUser({
         username,
         usercode,
@@ -101,13 +106,6 @@ export class ClubAttendanceController {
         user: newUser,
         date,
       });
-      ////////
-      // attendance
-      // club_attendance를 다박아줘야하네
-      ////////
-      // club_attendance
-      // totalnum + 1
-      // 출석 체크
     }
   }
 

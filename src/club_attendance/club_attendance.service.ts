@@ -103,12 +103,10 @@ export class ClubAttendanceService {
     }
   }
 
-  async addCheckNum({ date, clubId, username, usercode }) {
+  async getClubAttendanceByDateClubId({ clubId, date }) {
     const club = await this.getClubById(clubId);
     let now_club_attendance;
 
-    // club_attendance
-    // checkNum + 1
     const club_attendance_array = club.club_attendances;
     club_attendance_array.forEach(async (each) => {
       if (each.date === date) {
@@ -117,6 +115,29 @@ export class ClubAttendanceService {
         await this.club_attendanceRepository.save(each);
       }
     });
+    return now_club_attendance;
+  }
+
+  async addCheckNum({ date, clubId, username, usercode }) {
+    // const club = await this.getClubById(clubId);
+    // let now_club_attendance;
+    // const club_attendance_array = club.club_attendances;
+    // club_attendance_array.forEach(async (each) => {
+    //   if (each.date === date) {
+    //     each.checkNum++;
+    //     now_club_attendance = each;
+    //     await this.club_attendanceRepository.save(each);
+    //   }
+    // });
+
+    // club_attendance
+    // checkNum + 1
+    const club_attendance = await this.getClubAttendanceByDateClubId({
+      clubId,
+      date,
+    });
+    club_attendance.checkNum++;
+    await this.club_attendanceRepository.save(club_attendance);
 
     // attendance
     // isChecked true 수정
@@ -124,7 +145,7 @@ export class ClubAttendanceService {
       where: { user_name: username, code: usercode },
     });
     user.attendances.forEach(async (user_attendance) => {
-      if (user_attendance.club_attendance.id === now_club_attendance.id) {
+      if (user_attendance.club_attendance.id === club_attendance.id) {
         user_attendance.isChecked = true;
         await this.attendanceRepository.save(user_attendance);
       }
