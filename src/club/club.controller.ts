@@ -103,11 +103,17 @@ export class ClubController {
     return this.clubService.deleteClub(id, user);
   }
 
-  @Patch('club/:id/status')
-  updateClubStatus(
+  @ApiOperation({ summary: '동아리 수정' })
+  @ApiBody({
+    description:
+      'club_code는 안넣어도 됨. 안넣으면 club_code가 기본코드로 들어감',
+    type: swagger.createClubRequest,
+  })
+  @Patch('club/:id')
+  updateClub(
     @Param('id') id: number,
-    @Body('status', ClubStatusValidationPipe) status: ClubStatus,
+    @Body() createClubDto: CreateClubDto, //
   ): Promise<Club> {
-    return this.clubService.updateClubStatus(id, status);
+    return this.clubService.updateClub(createClubDto, id);
   }
 }

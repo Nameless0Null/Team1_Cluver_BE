@@ -7,6 +7,7 @@ import * as nodemailer from 'nodemailer';
 import { Email } from 'src/entity/email.entity';
 
 const SERVER_URL = process.env.SERVER_URL;
+console.log(SERVER_URL);
 @Injectable()
 export class EmailService {
   constructor(
