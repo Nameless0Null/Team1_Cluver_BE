@@ -23,6 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const manager = await this.managerRepository.findOne({
       where: { manager_name: name },
     });
+
     if (!manager) {
       throw new UnauthorizedException('토큰이 유효하지 않음');
     }
