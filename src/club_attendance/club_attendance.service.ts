@@ -82,54 +82,38 @@ export class ClubAttendanceService {
 
   async checkCode({ clubId, date, code }) {
     const club = await this.getClubById(clubId);
-    let now_club_attendance;
+    let now_club_attendance: ClubAttendance | undefined;
 
-    console.log(club.club_attendances);
-    club.club_attendances.forEach(async (each) => {
-      console.log('each : ', each);
+    for (const each of club.club_attendances) {
       if (each.date === date) {
         now_club_attendance = each;
+        break;
       }
-    });
+    }
 
     if (!now_club_attendance) {
       throw new BadRequestException('해당 날짜의 출석체크는 없음.');
     }
 
-    if (now_club_attendance.checkCode === code) {
-      return true;
-    } else {
-      return false;
-    }
+    return now_club_attendance.checkCode === code;
   }
 
   async getClubAttendanceByDateClubId({ clubId, date }) {
     const club = await this.getClubById(clubId);
-    let now_club_attendance;
+    let now_club_attendance: ClubAttendance | undefined;
 
-    const club_attendance_array = club.club_attendances;
-    club_attendance_array.forEach(async (each) => {
+    for (const each of club.club_attendances) {
       if (each.date === date) {
         each.checkNum++;
         now_club_attendance = each;
         await this.club_attendanceRepository.save(each);
+        break;
       }
-    });
+    }
     return now_club_attendance;
   }
 
   async addCheckNum({ date, clubId, username, usercode }) {
-    // const club = await this.getClubById(clubId);
-    // let now_club_attendance;
-    // const club_attendance_array = club.club_attendances;
-    // club_attendance_array.forEach(async (each) => {
-    //   if (each.date === date) {
-    //     each.checkNum++;
-    //     now_club_attendance = each;
-    //     await this.club_attendanceRepository.save(each);
-    //   }
-    // });
-
     // club_attendance
     // checkNum + 1
     const club_attendance = await this.getClubAttendanceByDateClubId({
@@ -144,12 +128,13 @@ export class ClubAttendanceService {
     const user = await this.userRepository.findOne({
       where: { user_name: username, code: usercode },
     });
-    user.attendances.forEach(async (user_attendance) => {
-      if (user_attendance.club_attendance.id === club_attendance.id) {
-        user_attendance.isChecked = true;
-        await this.attendanceRepository.save(user_attendance);
+
+    for (const userAttendance of user.attendances) {
+      if (userAttendance.club_attendance.id === club_attendance.id) {
+        userAttendance.isChecked = true;
+        await this.attendanceRepository.save(userAttendance);
       }
-    });
+    }
   }
 
   // 새로운 유저
@@ -235,50 +220,46 @@ export class ClubAttendanceService {
       throw new NotFoundException('해당 club_attendance 없음');
 
     const attendance_array = await this.attendanceRepository.find({
-      select: ['id', 'isChecked'],
       where: { club_attendance },
     });
-
-    const attendance_id_array = [];
-    const user_id_array = [];
-
-    attendance_array.forEach((element) => {
-      console.log(element);
-      console.log(element.isChecked);
-      if (element.isChecked) attendance_id_array.push(element.id);
-    });
-
     const user_array = club.users;
 
-    user_array.forEach((each_user) => {
-      each_user.attendances.forEach((attendance) => {
-        // console.log(attendance.id);
-        // console.log(attendance_id_array);
-        if (attendance_id_array.includes(attendance.id)) {
-          // console.log('걸린 ', attendance.id);
-          user_id_array.push(each_user.id);
-          return true;
-        }
-
-        return false;
-      });
-    });
+    const attendance_id_array = [];
+    for (const each of attendance_array) {
+      attendance_id_array.push(each.id);
+    }
 
     const result = [];
 
-    user_array.forEach((element) => {
-      if (user_id_array.includes(element.id)) {
-        const username = element.user_name;
-        const usercode = element.code;
-        result.push({ username, usercode });
+    for (const user of user_array) {
+      for (const attendance of user.attendances) {
+        if (attendance_id_array.includes(attendance.id)) {
+          result.push({
+            name: user.user_name,
+            code: user.code,
+            isChecked: attendance.isChecked,
+          });
+          break;
+        }
       }
-    });
+    }
 
     return result;
+    // const result = [];
+
+    // user_array.forEach((element) => {
+    //   if (user_id_array.includes(element.id)) {
+    //     const username = element.user_name;
+    //     const usercode = element.code;
+    //     result.push({ username, usercode });
+    //   }
+    // });
+
+    // return result;
 
     // for -> user array
     //   for -> user_array.attendance
-    //     attendance.id in dattendance_array
+    //     attendance.id in attendance_array
     //       result 에 user_id, user_code 추가
   }
 }
