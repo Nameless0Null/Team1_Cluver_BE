@@ -57,7 +57,7 @@ export class EmailController {
   ) {
     const token = params.token;
     const email = params.email;
-    console.log('params : ', params);
+
     const check_result = await this.emailService.checkToken({ token, email });
     if (check_result) return email_success_html;
     return '인증실패';

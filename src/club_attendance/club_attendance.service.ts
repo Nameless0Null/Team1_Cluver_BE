@@ -100,17 +100,12 @@ export class ClubAttendanceService {
 
   async getClubAttendanceByDateClubId({ clubId, date }) {
     const club = await this.getClubById(clubId);
-    let now_club_attendance: ClubAttendance | undefined;
 
     for (const each of club.club_attendances) {
       if (each.date === date) {
-        each.checkNum++;
-        now_club_attendance = each;
-        await this.club_attendanceRepository.save(each);
-        break;
+        return each;
       }
     }
-    return now_club_attendance;
   }
 
   async addCheckNum({ date, clubId, username, usercode }) {
@@ -133,41 +128,81 @@ export class ClubAttendanceService {
       if (userAttendance.club_attendance.id === club_attendance.id) {
         userAttendance.isChecked = true;
         await this.attendanceRepository.save(userAttendance);
+        break;
       }
     }
   }
 
   // 새로운 유저
   async addUser({ username, usercode, clubId }) {
-    const club = await this.getClubById(clubId);
-    const newUser = { user_name: username, code: usercode, club };
-    return await this.userRepository.save(newUser);
+    let club = await this.getClubById(clubId);
+    let newUser = { user_name: username, code: usercode, club };
+    newUser = await this.userRepository.save(newUser);
+
+    club = await this.getClubById(clubId);
+    const users = club.users;
+    const totalNum = users.length;
+
+    const club_attendances = club.club_attendances;
+    for (const club_attendance of club_attendances) {
+      club_attendance.totalNum = totalNum;
+      await this.club_attendanceRepository.save(club_attendance);
+    }
+
+    return newUser;
   }
 
   async addAttendances({ clubId, user, date }) {
     const club = await this.getClubById(clubId);
     const club_attendances = club.club_attendances;
+    let now_club_attendance;
 
-    club_attendances.forEach(async (club_attendance) => {
+    // attendance 새로 박기
+    for (const club_attendance of club_attendances) {
       if (club_attendance.date === date) {
-        const newRow_attendance = {
-          isChecked: true,
-          user,
-          club_attendance,
-        };
-        await this.attendanceRepository.save(newRow_attendance);
-        club_attendance.totalNum++;
-        club_attendance.checkNum++;
-        await this.club_attendanceRepository.save(club_attendance);
-      } else {
-        const newRow_attendance = {
-          isChecked: false,
-          user,
-          club_attendance,
-        };
-        await this.attendanceRepository.save(newRow_attendance);
+        now_club_attendance = club_attendance;
       }
+      const new_attendance = { isChecked: false, user, club_attendance };
+      await this.attendanceRepository.save(new_attendance);
+    }
+
+    const nowUser = await this.userRepository.findOne({
+      where: { id: user.id },
     });
+    const attendances = nowUser.attendances;
+
+    for (const attendance of attendances) {
+      if (attendance.club_attendance.id === now_club_attendance.id) {
+        attendance.isChecked = true;
+        const result1 = await this.attendanceRepository.save(attendance);
+        // club_attendance totalNum checkNum 관련
+        now_club_attendance.checkNum++;
+        const result2 = await this.club_attendanceRepository.save(
+          now_club_attendance,
+        );
+      }
+    }
+
+    // club_attendances.forEach(async (club_attendance) => {
+    //   if (club_attendance.date === date) {
+    //     const newRow_attendance = {
+    //       isChecked: true,
+    //       user,
+    //       club_attendance,
+    //     };
+    //     await this.attendanceRepository.save(newRow_attendance);
+    //     club_attendance.totalNum++;
+    //     club_attendance.checkNum++;
+    //     await this.club_attendanceRepository.save(club_attendance);
+    //   } else {
+    //     const newRow_attendance = {
+    //       isChecked: false,
+    //       user,
+    //       club_attendance,
+    //     };
+    //     await this.attendanceRepository.save(newRow_attendance);
+    //   }
+    // });
   }
 
   async 조회({ date, clubId }) {
@@ -245,21 +280,5 @@ export class ClubAttendanceService {
     }
 
     return result;
-    // const result = [];
-
-    // user_array.forEach((element) => {
-    //   if (user_id_array.includes(element.id)) {
-    //     const username = element.user_name;
-    //     const usercode = element.code;
-    //     result.push({ username, usercode });
-    //   }
-    // });
-
-    // return result;
-
-    // for -> user array
-    //   for -> user_array.attendance
-    //     attendance.id in attendance_array
-    //       result 에 user_id, user_code 추가
   }
 }

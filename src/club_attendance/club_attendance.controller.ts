@@ -101,7 +101,7 @@ export class ClubAttendanceController {
         usercode,
         clubId,
       });
-      this.clubAttendanceService.addAttendances({
+      await this.clubAttendanceService.addAttendances({
         clubId,
         user: newUser,
         date,

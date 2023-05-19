@@ -148,11 +148,13 @@ club 조회시에 user -> attendance 가 순서대로
 
 -----------------------
 [0520]
-attendance 순서체크 필요
-attendance가 생기는 기준 / 체크해봐야할 것
--> 기존 유저가 있는 상태에서 startCheck 할 때 추가
--> 새로운 유저 doCheck 하면 attendance 쭉 생성할 때
--> 기존유저가 doCheck 할때, 혹시 id가 바뀌나?
+attendance 순서체크 필요 / totalNum 이상한 문제
+체크해봐야할 것
+1. 유저없는 상태에서, startCheck -> 한 유저가 doCheck 여러번
+2. 유저있는 상태에서, doCheck 찍었을 때,
+3. 유저있는 상태에서, 새로운 startCheck
+
+
 
 이메일 인증 api 테스트
 

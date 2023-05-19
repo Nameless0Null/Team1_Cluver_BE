@@ -40,7 +40,6 @@ export class ClubController {
   Test(
     @GetUser() manager: Manager, //
   ) {
-    console.log(manager);
     return manager;
   }
 
