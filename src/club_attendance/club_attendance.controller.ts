@@ -15,6 +15,7 @@ import {
   Res,
   Query,
   Param,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   clubId_date_Request,
@@ -25,6 +26,7 @@ import {
   startCheckResponse,
 } from 'src/configs/swagger.config';
 import { ClubAttendance } from 'src/entity/club_attendance.entity';
+import { NotFoundError } from 'rxjs';
 
 @ApiTags('출석')
 @Controller('club-attendance')
@@ -78,34 +80,61 @@ export class ClubAttendanceController {
     @Body('username') username: string,
     @Body('usercode') usercode: string,
   ) {
-    const isUser = await this.clubAttendanceService.getUserByNameCode({
+    // 출석체크 경우의 수
+    // 1. 아예 새로운 유저가 1번동아리 출석체크
+    //// user 새로 추가 (addNewUser)
+    //// attendance 전체 추가 / isChecked 반영
+    //// club_attendance number 반영
+    // 2. 2번 동아리 유저가, 1번동아리 새로 출석체크
+    //// user 추가 (addExistingUser)
+    //// attendance 전체 추가 / isChecked 반영
+    //// club_attendance number 반영
+    // 3. 기존 1번동아리 유저가, 1번동아리 출석체크
+    //// attendance 한줄 추가 / isChecked 반영
+    //// club_attendance number 반영
+
+    const club = await this.clubAttendanceService.getClubById(clubId);
+    const user = await this.clubAttendanceService.getUserByNameCode({
       username,
       usercode,
     });
 
-    // 기존에 있던 유저가 출석체크 한거면
-    // 1. club_Attendance에 checkNum 반영
-    if (isUser) {
-      await this.clubAttendanceService.addCheckNum({
-        date,
-        clubId,
+    if (!club) throw new NotFoundException('해당 클럽은 없음');
+    if (!user) {
+      const saved_user = await this.clubAttendanceService.addNewUser({
         username,
         usercode,
-      });
-    }
-    // 기존에 없던 유저인 경우
-    // 1. club_Attendance에 checkNum 반영
-    else {
-      const newUser = await this.clubAttendanceService.addUser({
-        username,
-        usercode,
-        clubId,
+        club,
       });
       await this.clubAttendanceService.addAttendances({
-        clubId,
-        user: newUser,
+        club,
+        user: saved_user,
         date,
       });
+      await this.clubAttendanceService.checkNum반영({ club, date });
+    } else {
+      // 유저는 있는데 다른 동아리 유저일때
+      if (!(await this.clubAttendanceService.checkClubUser({ user, club }))) {
+        const saved_user = await this.clubAttendanceService.addExistingUser({
+          user,
+          club,
+        });
+        await this.clubAttendanceService.addAttendances({
+          club,
+          user: saved_user,
+          date,
+        });
+        await this.clubAttendanceService.checkTrue({ date, clubId, user });
+        await this.clubAttendanceService.checkNum반영({ club, date });
+      }
+      // 기존 동아리 유저일때
+      else if (await this.clubAttendanceService.checkClubUser({ user, club })) {
+        console.log('기존 동아리 유저일 때 물림');
+        await this.clubAttendanceService.checkTrue({ date, clubId, user });
+        console.log('1');
+        await this.clubAttendanceService.checkNum반영({ club, date });
+        console.log('2');
+      }
     }
   }
 
@@ -143,6 +172,23 @@ export class ClubAttendanceController {
     @Body('clubId') clubId: number,
   ) {
     return this.clubAttendanceService.마감({ date, clubId });
+  }
+
+  @ApiOperation({ summary: '출석 마감한거 다시 유효하게' })
+  @ApiBody({
+    description: 'club_attendance의 isValid를 true로 바꿈.',
+    type: clubId_date_Request,
+  })
+  @ApiCreatedResponse({
+    description: '다시 유효하게 만든 club_attendance 정보 반환',
+    type: ClubAttendance,
+  })
+  @Post('/restart')
+  출석다시시작(
+    @Body('date') date: string, //
+    @Body('clubId') clubId: number,
+  ) {
+    return this.clubAttendanceService.다시시작({ date, clubId });
   }
 
   @ApiOperation({ summary: '조회' })

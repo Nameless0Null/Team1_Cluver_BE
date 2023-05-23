@@ -30,7 +30,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(authCredentialDto: AuthCredentialDto): Promise<Manager> {
+  async signUp(
+    authCredentialDto: AuthCredentialDto,
+  ): Promise<IManagerWithoutPassword> {
     const { id, email, name, password } = authCredentialDto;
 
     const manager_id = id;
@@ -48,7 +50,9 @@ export class AuthService {
     };
 
     try {
-      return await this.managerRepository.save(manager);
+      const result = await this.managerRepository.save(manager);
+      const { manager_password, ...managerWithoutPassword } = result;
+      return managerWithoutPassword;
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('존재하는 매니저이름');

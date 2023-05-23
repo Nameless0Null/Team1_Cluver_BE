@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getToken } from 'src/auth/utils';
 import { Manager } from 'src/entity/manager.entity';
@@ -102,7 +102,11 @@ export class EmailService {
   }
 
   async 이메일인증완료체크({ email }) {
-    const isChecked = await this.emailRepository.findOne({ where: { email } });
+    const result = await this.emailRepository.findOne({ where: { email } });
+    if (!result) {
+      throw new NotFoundException('해당 이메일이 db에 없음');
+    }
+    const isChecked = result.isChecked;
     return isChecked;
   }
 
