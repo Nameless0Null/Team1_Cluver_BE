@@ -110,3 +110,16 @@ export class email_Request {
   @ApiProperty()
   email: string;
 }
+
+export class clubId {
+  @ApiProperty()
+  clubId: number;
+}
+
+export class postWrite {
+  @ApiProperty()
+  clubId: number;
+
+  @ApiProperty()
+  content: string;
+}
