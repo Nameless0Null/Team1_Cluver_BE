@@ -4,8 +4,6 @@ import * as config from 'config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { setupSwagger } from './configs/swagger.config';
 
-export const SERVER_URL = `http://localhost:8000`;
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   setupSwagger(app);

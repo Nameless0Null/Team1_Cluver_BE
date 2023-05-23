@@ -82,86 +82,181 @@ export class ClubAttendanceService {
 
   async checkCode({ clubId, date, code }) {
     const club = await this.getClubById(clubId);
-    let now_club_attendance;
+    let now_club_attendance: ClubAttendance | undefined;
 
-    console.log(club.club_attendances);
-    club.club_attendances.forEach(async (each) => {
-      console.log('each : ', each);
+    for (const each of club.club_attendances) {
       if (each.date === date) {
         now_club_attendance = each;
+        break;
       }
-    });
+    }
 
     if (!now_club_attendance) {
       throw new BadRequestException('해당 날짜의 출석체크는 없음.');
     }
 
-    if (now_club_attendance.checkCode === code) {
-      return true;
-    } else {
-      return false;
+    return now_club_attendance.checkCode === code;
+  }
+
+  async getClubAttendanceByDateClubId({ clubId, date }) {
+    const club = await this.getClubById(clubId);
+
+    for (const each of club.club_attendances) {
+      if (each.date === date) {
+        return each;
+      }
     }
   }
 
-  async addCheckNum({ date, clubId, username, usercode }) {
+  async 출석했는지체크({ date, username, usercode, clubId }): Promise<boolean> {
+    let isAlreadyFlag = false;
+
     const club = await this.getClubById(clubId);
-    let now_club_attendance;
 
-    // club_attendance
-    // checkNum + 1
-    const club_attendance_array = club.club_attendances;
-    club_attendance_array.forEach(async (each) => {
-      if (each.date === date) {
-        each.checkNum++;
-        now_club_attendance = each;
-        await this.club_attendanceRepository.save(each);
-      }
-    });
-
-    // attendance
-    // isChecked true 수정
     const user = await this.userRepository.findOne({
       where: { user_name: username, code: usercode },
     });
-    user.attendances.forEach(async (user_attendance) => {
-      if (user_attendance.club_attendance.id === now_club_attendance.id) {
-        user_attendance.isChecked = true;
-        await this.attendanceRepository.save(user_attendance);
+
+    console.log(user);
+
+    for (const userAttendance of user.attendances) {
+      if (
+        userAttendance.club_attendance.date === date &&
+        userAttendance.club_attendance.club.id === clubId
+      ) {
+        isAlreadyFlag = userAttendance.isChecked;
+        break;
       }
+    }
+    return isAlreadyFlag;
+  }
+
+  async checkTrue({ date, clubId, user }) {
+    // attendance
+    // isChecked true 수정
+    const club_attendance = await this.getClubAttendanceByDateClubId({
+      clubId,
+      date,
     });
+    for (const userAttendance of user.attendances) {
+      if (userAttendance.club_attendance.id === club_attendance.id) {
+        userAttendance.isChecked = true;
+        await this.attendanceRepository.save(userAttendance);
+        break;
+      }
+    }
+  }
+
+  ///////////////// 유저추가부분
+
+  // 클럽에 해당유저가 가입되어있으면 true
+  // 아니면 false
+  async checkClubUser({ user, club }): Promise<boolean> {
+    const club_user_ids = [];
+    club.users.map((eachUser) => {
+      club_user_ids.push(eachUser.id);
+    });
+
+    if (club_user_ids.includes(user.id)) {
+      return true;
+    }
+    return false;
+  }
+
+  // user가 있으면
+  //
+  async addExistingUser({ user, club }) {
+    const saved_user = user;
+
+    // club Repository에 저장
+    club.users.push(saved_user);
+    const saved_club = await this.clubRepository.save(club);
+
+    // totalNum 반영
+    await this.totalNum반영({ club: saved_club });
+
+    return user;
   }
 
   // 새로운 유저
-  async addUser({ username, usercode, clubId }) {
-    const club = await this.getClubById(clubId);
-    const newUser = { user_name: username, code: usercode, club };
-    return await this.userRepository.save(newUser);
+  async addNewUser({ username, usercode, club }) {
+    // user Repository에 저장
+    const newUser = { user_name: username, code: usercode };
+    const saved_user = await this.userRepository.save(newUser);
+
+    // club Repository에 저장
+    club.users.push(saved_user);
+    const saved_club = await this.clubRepository.save(club);
+
+    // totalNum 반영
+    await this.totalNum반영({ club: saved_club });
+
+    return saved_user;
   }
 
-  async addAttendances({ clubId, user, date }) {
-    const club = await this.getClubById(clubId);
-    const club_attendances = club.club_attendances;
+  async totalNum반영({ club }) {
+    // club_attendance의 totalNum 수정
+    const users = club.users;
+    const totalNum = users.length;
 
-    club_attendances.forEach(async (club_attendance) => {
-      if (club_attendance.date === date) {
-        const newRow_attendance = {
-          isChecked: true,
-          user,
-          club_attendance,
-        };
-        await this.attendanceRepository.save(newRow_attendance);
-        club_attendance.totalNum++;
-        club_attendance.checkNum++;
-        await this.club_attendanceRepository.save(club_attendance);
-      } else {
-        const newRow_attendance = {
-          isChecked: false,
-          user,
-          club_attendance,
-        };
-        await this.attendanceRepository.save(newRow_attendance);
+    const club_attendances = club.club_attendances;
+    for (const club_attendance of club_attendances) {
+      club_attendance.totalNum = totalNum;
+      await this.club_attendanceRepository.save(club_attendance);
+    }
+  }
+
+  async checkNum반영({ club, date }) {
+    // club_attendance 집어오기
+    const club_attendances = club.club_attendances;
+    let club_attendance;
+    for (const each of club_attendances) {
+      if (each.date === date) {
+        club_attendance = each;
+        break;
       }
+    }
+
+    // attendance 테이블에서, club_attendance id인 놈들 집어오기
+    // attendance에서 isChecked 갯수 세기
+    let checkNum = 0;
+    const attendances = await this.attendanceRepository.find({
+      where: { club_attendance },
     });
+    for (const each of attendances) {
+      if (each.isChecked) checkNum++;
+    }
+    club_attendance.checkNum = checkNum;
+
+    // club_attendance 레포지토리에 저장
+    await this.club_attendanceRepository.save(club_attendance);
+  }
+
+  async addAttendances({ club, user, date }) {
+    const club_attendances = club.club_attendances;
+    let now_club_attendance;
+
+    // attendance 싹 박기
+    for (const club_attendance of club_attendances) {
+      if (club_attendance.date === date) {
+        now_club_attendance = club_attendance;
+      }
+      const new_attendance = { isChecked: false, user, club_attendance };
+      await this.attendanceRepository.save(new_attendance);
+    }
+
+    // attendance 중에 출석누른거 isChecked true로 바꾸기.
+    const saved_user = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+    const attendances = saved_user.attendances;
+    for (const attendance of attendances) {
+      if (attendance.club_attendance.id === now_club_attendance.id) {
+        attendance.isChecked = true;
+        await this.attendanceRepository.save(attendance);
+        break;
+      }
+    }
   }
 
   async 조회({ date, clubId }) {
@@ -192,6 +287,21 @@ export class ClubAttendanceService {
     return result_club_attendance;
   }
 
+  async 다시시작({ date, clubId }) {
+    const club = await this.getClubById(clubId);
+    let result_club_attendance = null;
+    const club_attendances = club.club_attendances;
+    club_attendances.forEach((each_club_attendance) => {
+      if (each_club_attendance.date === date) {
+        result_club_attendance = each_club_attendance;
+      }
+    });
+    result_club_attendance.isValid = true;
+    await this.club_attendanceRepository.save(result_club_attendance);
+
+    return result_club_attendance;
+  }
+
   async 코드체크({ date, clubId, code }) {
     const club_attendance = await this.조회({ clubId, date });
     if (!club_attendance) {
@@ -214,50 +324,30 @@ export class ClubAttendanceService {
       throw new NotFoundException('해당 club_attendance 없음');
 
     const attendance_array = await this.attendanceRepository.find({
-      select: ['id', 'isChecked'],
       where: { club_attendance },
     });
-
-    const attendance_id_array = [];
-    const user_id_array = [];
-
-    attendance_array.forEach((element) => {
-      console.log(element);
-      console.log(element.isChecked);
-      if (element.isChecked) attendance_id_array.push(element.id);
-    });
-
     const user_array = club.users;
 
-    user_array.forEach((each_user) => {
-      each_user.attendances.forEach((attendance) => {
-        // console.log(attendance.id);
-        // console.log(attendance_id_array);
-        if (attendance_id_array.includes(attendance.id)) {
-          // console.log('걸린 ', attendance.id);
-          user_id_array.push(each_user.id);
-          return true;
-        }
-
-        return false;
-      });
-    });
+    const attendance_id_array = [];
+    for (const each of attendance_array) {
+      attendance_id_array.push(each.id);
+    }
 
     const result = [];
 
-    user_array.forEach((element) => {
-      if (user_id_array.includes(element.id)) {
-        const username = element.user_name;
-        const usercode = element.code;
-        result.push({ username, usercode });
+    for (const user of user_array) {
+      for (const attendance of user.attendances) {
+        if (attendance_id_array.includes(attendance.id)) {
+          result.push({
+            name: user.user_name,
+            code: user.code,
+            isChecked: attendance.isChecked,
+          });
+          break;
+        }
       }
-    });
+    }
 
     return result;
-
-    // for -> user array
-    //   for -> user_array.attendance
-    //     attendance.id in dattendance_array
-    //       result 에 user_id, user_code 추가
   }
 }

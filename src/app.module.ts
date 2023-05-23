@@ -7,6 +7,8 @@ import { ConfigurationModule } from 'config/config.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { ClubAttendanceModule } from './club_attendance/club_attendance.module';
 import { EmailModule } from './email/email.module';
+import { TestModule } from './test/test.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { EmailModule } from './email/email.module';
     }),
     ClubAttendanceModule,
     EmailModule,
+    TestModule,
+    PostModule,
     // TypeOrmModule.forRoot(typeORMConfigAsync), //
   ],
   controllers: [],

@@ -98,12 +98,16 @@ export class ClubService {
     }
   }
 
-  async updateClubStatus(id: number, status: ClubStatus): Promise<Club> {
+  async updateClub(createClubDto, id: number): Promise<Club> {
     const club = await this.getClubById(id);
+    const { name, description, img, is_public, club_code } = createClubDto;
 
-    club.status = status;
-    await this.clubRepository.save(club);
+    club.name = name;
+    club.description = description;
+    club.img = img;
+    club.club_code = club_code;
+    club.status = is_public ? ClubStatus.PUBLIC : ClubStatus.PRIVATE;
 
-    return club;
+    return await this.clubRepository.save(club);
   }
 }

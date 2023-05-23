@@ -14,6 +14,7 @@ import { User } from './user.entity';
 import { Manager } from './manager.entity';
 import { Attendance } from 'src/entity/attendance.entity';
 import { ClubAttendance } from './club_attendance.entity';
+import { Post } from './post.entity';
 
 @Entity()
 export class Club extends BaseEntity {
@@ -44,7 +45,7 @@ export class Club extends BaseEntity {
   // 한사람당 동아리 무조건 하나
   // 동아리:유저 = 1:N
   @JoinTable()
-  @OneToMany((type) => User, (users) => users.club, { eager: true })
+  @ManyToMany((type) => User, (users) => users.clubs, { eager: true })
   users: User[];
 
   // 동아리 하나당 관리자 여럿
@@ -52,4 +53,8 @@ export class Club extends BaseEntity {
   @JoinTable()
   @ManyToMany((type) => Manager, (managers) => managers.clubs, { eager: false })
   managers: Manager[];
+
+  // 게시물
+  @OneToMany(() => Post, (post) => post.club, { eager: true })
+  posts: Post[];
 }

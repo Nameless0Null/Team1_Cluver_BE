@@ -9,32 +9,18 @@ export function getToken(): string {
 }
 
 export const email_success_html = `
-<div id="root" hyundai="true">
-  <div class="jss6 jss1">
-    <div class="jss6 jss103 type4_hyundai">
-      <div class="jss108">
-        <div style="width: 128px;">
-          <h2>
-            <img src="https://d3337ehzyte0uu.cloudfront.net/static/media/hyundai_logo.png" alt="HYUNDAI" class="jss106" />
-          </h2>
-        </div>
-      </div>
-    </div>
-  <div class="jss7 jss46 grey-box">
-    <div class="jss3">
-      <h6 class="jss110 jss127 jss4">이메일 인증 안내</h6>
-      <span class="jss110 jss120 jss5">이메일 인증이 완료되었습니다.</span>
-    </div>
+<body style="background: linear-gradient(135deg, #89ec84 0%, #abc0e4 55%, #abc0e4 83%, #c7d5ed 100%); display: flex; justify-content: center; align-items: center; height: 100vh;">
+  <div id="root" style="width: 400px; padding: 20px; background-color: #fff; border-radius: 4px; text-align: center; font-family: Arial, sans-serif;">
+    <div class="title" style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">인증성공</div>
+    <div class="subtitle" style="font-size: 18px; margin-bottom: 10px;">Cluver 이메일 인증에 성공했습니다.</div>
+    <div class="content" style="font-size: 16px;">원래 페이지로 돌아가, 이메일 인증을 완료해주세요/</div>
+    <button onclick="closePage()" style="margin-top: 20px; background-color: #abc0e4; color: #fff; border: none; border-radius: 4px; padding: 10px 20px; font-size: 16px; cursor: pointer;">Close</button>
   </div>
-  <div class="jss7 jss46 grey-line-bottom">
-    <div class="inner-box">
-      <div class="btn-common1">
-        <button onclick="window.close()" class="jss172 jss146 jss157 jss158 jss160 jss161" tabindex="0" type="button">
-          <span class="jss147">확인</span>
-          <span class="jss175"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+
+  <script>
+    function closePage() {
+      window.close();
+    }
+  </script>
+</body>
 `;
