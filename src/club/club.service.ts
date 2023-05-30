@@ -12,6 +12,7 @@ import { ILike, Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Manager } from 'src/entity/manager.entity';
 import { Attendance } from 'src/entity/attendance.entity';
+import { ClubAttendance } from 'src/entity/club_attendance.entity';
 
 @Injectable()
 export class ClubService {
@@ -27,10 +28,19 @@ export class ClubService {
 
     @InjectRepository(Attendance)
     private attendanceRepository: Repository<Attendance>,
+
+    @InjectRepository(ClubAttendance)
+    private clubAttendanceRepository: Repository<ClubAttendance>,
   ) {}
 
   async getAllClubs(): Promise<Club[]> {
-    const found = await this.clubRepository.find();
+    const found = await this.clubRepository.find({ order: { name: 'ASC' } });
+    const test = await this.attendanceRepository.find({ order: { id: 'ASC' } });
+
+    for (const attendance of test) {
+      console.log(attendance.club_attendance.date);
+    }
+
     return found;
   }
 
@@ -39,17 +49,53 @@ export class ClubService {
   }
 
   async getClubById(id: number): Promise<Club> {
-    const found = await this.clubRepository.findOne({ where: { id } });
+    const found = await this.clubRepository.findOne({
+      where: { id },
+    });
     if (!found) {
       throw new NotFoundException(`Can't found Club with id ${id}`);
     }
 
     // 동아리원 쭉 출력
-    const users: User[] = found.users;
-    users.forEach((user) => {});
 
-    // 동아리원 별로 이름 + 유저코드 + 출석배열 출력되게
-    return found;
+    // const club = await this.clubRepository.findOne({
+    //   relations: {
+    //     users: true,
+    //     attendances: true,
+    //   },
+    //   where: {
+    //     users: {
+    //       attendances: {
+    //         club: {
+    //           id: 1,
+    //         },
+    //       },
+    //     },
+    //   },
+    //   order: {
+    //     users: {
+    //       id: 'ASC',
+    //       attendances: {
+    //         id: 'ASC',
+    //       },
+    //     },
+    //   },
+    // });
+
+    const club = await this.clubRepository
+      .createQueryBuilder('club')
+      .leftJoinAndSelect('club.club_attendances', 'club_attendance')
+      .leftJoinAndSelect('club.users', 'user')
+      .leftJoinAndSelect('club.posts', 'post')
+      .leftJoinAndSelect('user.attendances', 'attendance')
+      .where('club.id = :clubId', { clubId: id })
+      .andWhere('attendance.clubId = :clubId', { clubId: id }) // Filter attendances by clubId
+      .orderBy('user.id', 'ASC')
+      .addOrderBy('attendance.id', 'ASC')
+      .addOrderBy('club_attendance.id', 'ASC')
+      .getOne();
+
+    return club;
   }
 
   async getClubsByName(name: string) {

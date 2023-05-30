@@ -27,6 +27,9 @@ export class Attendance extends BaseEntity {
   )
   club_attendance: ClubAttendance;
 
+  @ManyToOne(() => Club, (club) => club.attendances)
+  club: Club;
+
   @Column()
   isChecked: boolean;
 }

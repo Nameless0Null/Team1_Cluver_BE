@@ -57,4 +57,7 @@ export class Club extends BaseEntity {
   // 게시물
   @OneToMany(() => Post, (post) => post.club, { eager: true })
   posts: Post[];
+
+  @OneToMany(() => ClubAttendance, (club_attendance) => club_attendance.club)
+  attendances: ClubAttendance[];
 }
