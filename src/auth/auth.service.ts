@@ -97,7 +97,7 @@ export class AuthService {
 
   //여주경 코드, 메니저 회원가입
   //___________________________________________________________________________________________________________________
-  async registerNewManager(newManager: LoginDto): Promise<LoginDto> {
+  async registerNewManager(newManager: LoginDto): Promise<LoginDto> { //회원가입
     let managerFind: LoginDto = await this.managerService.findByFields({ where: {manager_id: newManager.manager_id } });
         if(managerFind){
             throw new HttpException('This id already used!', HttpStatus.BAD_REQUEST);
@@ -105,7 +105,7 @@ export class AuthService {
         return this.managerService.save(newManager);
     }
 
-  async validateManager(managerDTO: LoginDto): Promise<{accessToken: string} | undefined> {
+  async validateManager(managerDTO: LoginDto): Promise<{accessToken: string} | undefined> { //login
     let managerFind: Manager = await this.managerService.findByFields({
         where: { manager_id: managerDTO.manager_id}
     });

@@ -74,7 +74,7 @@ export class AuthController {
     type: Boolean,
   })
   @Get('/check')
-  @UseGuards(AuthGuard())
+  @UseGuards(new AuthGuard())
   authCheck(
     @GetUser() manager: Manager, //
   ) {
@@ -83,6 +83,57 @@ export class AuthController {
 
 
   //___________________________________________________________________________________________________________________
+  @Post('/signup_')
+    @UsePipes(ValidationPipe)
+    async registerAccount(@Req() req: Request, @Body() loginDto: LoginDto): Promise<any> {
+        return await this.authService.registerNewManager(loginDto);
+    }
 
+  @Post('/login')
+  async login(@Body() loginDto: LoginDto, @Res() res: Response): Promise<any> {
+      const jwt = await this.authService.validateManager(loginDto);
+      res.setHeader('Authorization', 'Bearer '+jwt.accessToken);
+      
+      res.cookie('jwt', jwt.accessToken, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000
+      })
+      
+      
+      return res.send({
+          message: 'success'
+      });
+  }
+
+  @Get('/authenticate')
+  @UseGuards(AuthGuard)
+  isAuthenticated(@Req() req: Request): any {
+      const user: any = req.user;
+      return user;
+  }
+  
+  @Get('/admin-role')
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(RoleType.ADMIN)
+    adminRoleCheck(@Req() req: Request): any {
+        const user: any = req.user;
+        return user;
+  }
+
+  @Get('/cookies')
+  getCookies(@Req() req: Request, @Res() res: Response): any {
+      const jwt = req.cookies['jwt'];
+      return res.send(jwt);
+  }
+
+  @Post('/logout')
+  logout(@Res() res: Response): any {
+      res.cookie('jwt', '', {
+          maxAge: 0
+      });
+      return res.send({
+          message: 'success'
+      })
+  }
 
 }
