@@ -13,8 +13,10 @@ import {
 import { Club } from './club.entity';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { ManagerAuthority } from './manager-authority.entity';
 
-@Entity()
+
+@Entity('manager')
 @Unique(['manager_id', 'manager_email'])
 export class Manager extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -41,4 +43,8 @@ export class Manager extends BaseEntity {
 
   @ManyToMany((type) => Club, (clubs) => clubs.managers, { eager: true })
   clubs: Club[];
+
+
+  @OneToMany(() => ManagerAuthority, managerAuthority => ManagerAuthority.manager, {eager: true})
+  authorities?: any[];
 }

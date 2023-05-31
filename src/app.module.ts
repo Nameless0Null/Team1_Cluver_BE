@@ -10,6 +10,9 @@ import { EmailModule } from './email/email.module';
 import { TestModule } from './test/test.module';
 import { PostModule } from './post/post.module';
 
+import { PassportModule } from '@nestjs/passport';
+
+
 @Module({
   imports: [
     ConfigurationModule,
@@ -31,6 +34,7 @@ import { PostModule } from './post/post.module';
     TestModule,
     PostModule,
     // TypeOrmModule.forRoot(typeORMConfigAsync), //
+    PassportModule,
   ],
   controllers: [],
   providers: [],

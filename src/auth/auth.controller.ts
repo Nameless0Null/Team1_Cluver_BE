@@ -4,12 +4,15 @@ import {
   Get,
   Post,
   Req,
+  Res,
   UseGuards,
   ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthService, IManagerWithoutPassword } from './auth.service';
 import { AuthCredentialDto } from './dto/auth-credentials';
-import { AuthGuard } from '@nestjs/passport';
+// import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from './security/auth.guard';
 import { GetUser } from './get-user.decorator';
 import { User } from 'src/entity/user.entity';
 import { LoginDto } from './dto/login.dto';
@@ -23,6 +26,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LoginRequest, signUpRequest } from 'src/configs/swagger.config';
+
+
+import { RolesGuard } from './security/roles.guard';
+import { RoleType } from './role-type';
+import { Roles } from './decorator/role.decorator';
+
+import { Response, Request } from 'express';
+
 
 interface OutputSignIn {
   accessToken: string;
@@ -69,4 +80,9 @@ export class AuthController {
   ) {
     return true as boolean;
   }
+
+
+  //___________________________________________________________________________________________________________________
+
+
 }

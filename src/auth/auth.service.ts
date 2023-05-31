@@ -4,7 +4,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
+  HttpException, 
+  HttpStatus,
 } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
@@ -14,7 +17,10 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { Manager } from 'src/entity/manager.entity';
 import { LoginDto } from './dto/login.dto';
 import { getToken } from './utils';
+
 import * as nodemailer from 'nodemailer';
+import { ManagerService } from './manager.service';
+import { Payload } from './security/payload.interface';
 export interface IManagerWithoutPassword {
   id: number;
   manager_id: string;
@@ -28,6 +34,7 @@ export class AuthService {
     @InjectRepository(Manager)
     private managerRepository: Repository<Manager>,
     private jwtService: JwtService,
+    private managerService: ManagerService
   ) {}
 
   async signUp(
@@ -65,15 +72,15 @@ export class AuthService {
   async signIn(
     loginDto: LoginDto,
   ): Promise<{ accessToken: string; manager: IManagerWithoutPassword }> {
-    const { id, password } = loginDto;
+    const { manager_id, manager_password } = loginDto;
     const manager = await this.managerRepository.findOne({
-      where: { manager_id: id },
+      where: { manager_id: manager_id },
     });
 
     if (!manager) {
-      throw new NotFoundException(`해당 id의 매니저 없음. id : ${id}`);
+      throw new NotFoundException(`해당 id의 매니저 없음. id : ${manager_id}`);
     }
-    if (manager && (await bcrypt.compare(password, manager.manager_password))) {
+    if (manager && (await bcrypt.compare(manager_password, manager.manager_password))) {
       const name = manager.manager_name;
       // 로그인 성공 로직
       const payload = { name };
@@ -86,4 +93,57 @@ export class AuthService {
       throw new UnauthorizedException('비밀번호가 틀림.');
     }
   }
+
+
+  //여주경 코드, 메니저 회원가입
+  //___________________________________________________________________________________________________________________
+  async registerNewManager(newManager: LoginDto): Promise<LoginDto> {
+    let managerFind: LoginDto = await this.managerService.findByFields({ where: {manager_id: newManager.manager_id } });
+        if(managerFind){
+            throw new HttpException('This id already used!', HttpStatus.BAD_REQUEST);
+        }
+        return this.managerService.save(newManager);
+    }
+
+  async validateManager(managerDTO: LoginDto): Promise<{accessToken: string} | undefined> {
+    let managerFind: Manager = await this.managerService.findByFields({
+        where: { manager_id: managerDTO.manager_id}
+    });
+    const validatePassword = await bcrypt.compare(managerDTO.manager_password, managerDTO.manager_password);
+    if(!managerFind || !validatePassword) {
+        throw new UnauthorizedException();
+    }
+
+    const payload: Payload = { id: managerFind.id, manager_id: managerFind.manager_id };
+
+    return {
+        accessToken: this.jwtService.sign(payload),
+    };
+  }
+  
+  
+  async tokenValidateManager(payload: Payload): Promise<Manager| undefined> {
+    const managerFind = await this.managerService.findByFields({
+        where: { manager_id: payload.manager_id }
+    });
+    this.flatAuthorities(managerFind);
+    return managerFind;
+  }
+  private flatAuthorities(manager: any): Manager {
+    if (manager && manager.authorities) {
+        const authorities: string[] = [];
+        manager.authorities.forEach(authority => authorities.push(authority.authorityName));
+        manager.authorities = authorities;
+    }
+    return manager;
+  }
+  private convertInAuthorities(manager: any): Manager {
+    if (manager && manager.authorities) {
+        const authorities: any[] = [];
+        manager.authorities.forEach(authority => authorities.push({ name: authority.authorityName }));
+        manager.authorities = authorities;
+    }
+    return manager;
+  }
+
 }
