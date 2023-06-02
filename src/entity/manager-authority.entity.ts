@@ -12,7 +12,7 @@ export class ManagerAuthority {
     @Column('varchar',{name: 'authority_name'})
     authorityName: string;
 
-    @ManyToOne(type=>Manager, manager=>manager.authorities)
+    @ManyToOne(type=>Manager, manager=>manager.clubs)
     @JoinColumn({name: 'manager_id'})
     manager: Manager;
   static manager: any;

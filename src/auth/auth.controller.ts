@@ -83,7 +83,7 @@ export class AuthController {
 
 
   //___________________________________________________________________________________________________________________
-  @Post('/signup_')
+  @Post('/register')
     @UsePipes(ValidationPipe)
     async registerAccount(@Req() req: Request, @Body() loginDto: LoginDto): Promise<any> {
         return await this.authService.registerNewManager(loginDto);
@@ -104,27 +104,20 @@ export class AuthController {
           message: 'success'
       });
   }
-
-  @Get('/authenticate')
-  @UseGuards(AuthGuard)
-  isAuthenticated(@Req() req: Request): any {
-      const user: any = req.user;
-      return user;
-  }
   
-  @Get('/admin-role')
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles(RoleType.ADMIN)
-    adminRoleCheck(@Req() req: Request): any {
-        const user: any = req.user;
-        return user;
-  }
+  // @Get('/admin-role')
+  //   @UseGuards(AuthGuard, RolesGuard)
+  //   @Roles(RoleType.ADMIN)
+  //   adminRoleCheck(@Req() req: Request): any {
+  //       const user: any = req.user;
+  //       return user;
+  // }
 
-  @Get('/cookies')
-  getCookies(@Req() req: Request, @Res() res: Response): any {
-      const jwt = req.cookies['jwt'];
-      return res.send(jwt);
-  }
+  // @Get('/cookies')
+  // getCookies(@Req() req: Request, @Res() res: Response): any {
+  //     const jwt = req.cookies['jwt'];
+  //     return res.send(jwt);
+  // }
 
   @Post('/logout')
   logout(@Res() res: Response): any {

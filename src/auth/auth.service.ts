@@ -31,7 +31,7 @@ export interface IManagerWithoutPassword {
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Manager)
+    // @InjectRepository(Manager)
     private managerRepository: Repository<Manager>,
     private jwtService: JwtService,
     private managerService: ManagerService
@@ -130,20 +130,20 @@ export class AuthService {
     return managerFind;
   }
   private flatAuthorities(manager: any): Manager {
-    if (manager && manager.authorities) {
-        const authorities: string[] = [];
-        manager.authorities.forEach(authority => authorities.push(authority.authorityName));
-        manager.authorities = authorities;
+    if (manager && manager.clubs) {
+        const clubs: string[] = [];
+        manager.clubs.forEach(clubs => clubs.push(clubs.authorityName));
+        manager.clubs = clubs;
     }
     return manager;
   }
-  private convertInAuthorities(manager: any): Manager {
-    if (manager && manager.authorities) {
-        const authorities: any[] = [];
-        manager.authorities.forEach(authority => authorities.push({ name: authority.authorityName }));
-        manager.authorities = authorities;
-    }
-    return manager;
-  }
+  // private convertInAuthorities(manager: any): Manager {
+  //   if (manager && manager.authorities) {
+  //       const clubs: any[] = [];
+  //       manager.clubs.forEach(clubs => clubs.push({ name: clubs.authorityName }));
+  //       manager.clubs = clubs;
+  //   }
+  //   return manager;
+  // }
 
 }

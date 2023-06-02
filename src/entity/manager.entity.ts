@@ -41,8 +41,8 @@ export class Manager extends BaseEntity {
 
   // eager 설정은, 이거 조회할 때 조인된 녀석들도 가져올지 말지 결정
 
-  @ManyToMany((type) => Club, (clubs) => clubs.managers, { eager: true })
-  clubs: Club[];
+  @ManyToMany((type) => Club, clubs => clubs.managers, { eager: true })
+  clubs?: Club[];
 
 
   @OneToMany(() => ManagerAuthority, managerAuthority => ManagerAuthority.manager, {eager: true})
